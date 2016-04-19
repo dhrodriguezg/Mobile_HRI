@@ -1,0 +1,245 @@
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android" xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:ignore="ContentDescription"
+    tools:context=".DraggingActivity"
+    android:orientation="horizontal">
+
+    <org.ros.android.view.RosImageView
+        android:id="@+id/streamingView"
+        android:layout_height="match_parent"
+        android:layout_width="match_parent"
+        android:src="@drawable/loading_wide" />
+
+    <ImageView
+        android:layout_width="50dp"
+        android:layout_height="50dp"
+        android:src="@drawable/target"
+        android:id="@+id/positionView"
+        android:layout_centerVertical="true"
+        android:layout_alignParentRight="true"
+        android:layout_marginRight="120dp"
+        android:alpha="0.3" />
+
+    <ImageView
+        android:layout_width="50dp"
+        android:layout_height="50dp"
+        android:src="@drawable/target_cool"
+        android:id="@+id/targetView"
+        android:layout_centerVertical="true"
+        android:layout_alignParentRight="true"
+        android:layout_marginRight="120dp" />
+
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:textAppearance="?android:attr/textAppearanceSmall"
+        android:id="@+id/msgTextView"
+        android:background="#ffffffff"
+        android:alpha="0.0"
+        android:textColor="#ff000000"
+        android:layout_alignParentLeft="true"
+        android:layout_above="@+id/emergencyButton"
+        android:gravity="start"
+        android:layout_below="@+id/textView"
+        android:layout_alignParentRight="true" />
+
+    <ToggleButton
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textOn="@string/emergency_on"
+        android:textOff="@string/emergency_off"
+        android:textAppearance="?android:attr/textAppearanceMedium"
+        android:id="@+id/emergencyButton"
+        android:layout_alignParentBottom="true"
+        android:layout_centerHorizontal="true"
+        android:checked="false"
+        android:textStyle="bold" />
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textAppearance="?android:attr/textAppearanceMedium"
+        android:text="@string/tracking"
+        android:id="@+id/textTracking"
+        android:layout_alignParentTop="true"
+        android:layout_toLeftOf="@+id/textView2" />
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textAppearance="?android:attr/textAppearanceMedium"
+        android:text="@string/empty_X3"
+        android:id="@+id/statusTracking"
+        android:layout_alignParentTop="true"
+        android:layout_toRightOf="@+id/textTracking"
+        android:background="#ffff0000"
+        android:alpha="0.7"
+        android:gravity="center_vertical|center_horizontal"
+        android:layout_toLeftOf="@+id/emergencyButton" />
+
+    <TextView
+        android:layout_width="20dp"
+        android:layout_height="wrap_content"
+        android:textAppearance="?android:attr/textAppearanceMedium"
+        android:text="@string/status_fail"
+        android:id="@+id/statusView"
+        android:background="#ffff0000"
+        android:alpha="0.7"
+        android:gravity="center_vertical|center_horizontal"
+        android:layout_alignParentTop="true"
+        android:layout_alignRight="@+id/showLog"
+        android:layout_toRightOf="@+id/emergencyButton" />
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textAppearance="?android:attr/textAppearanceMedium"
+        android:text="@string/status"
+        android:id="@+id/textView"
+        android:layout_alignParentTop="true"
+        android:layout_alignLeft="@+id/showHands"
+        android:layout_alignParentRight="true" />
+
+    <ImageView
+        android:layout_width="25dp"
+        android:layout_height="25dp"
+        android:src="@drawable/finger_index"
+        android:id="@+id/leftIndexFinger"
+        android:alpha="0"/>
+
+    <ImageView
+        android:layout_width="25dp"
+        android:layout_height="25dp"
+        android:src="@drawable/finger_middle"
+        android:id="@+id/leftMiddleFinger"
+        android:alpha="0"/>
+
+    <ImageView
+        android:layout_width="25dp"
+        android:layout_height="25dp"
+        android:src="@drawable/finger_ring"
+        android:id="@+id/leftRingFinger"
+        android:alpha="0"/>
+
+    <ImageView
+        android:layout_width="25dp"
+        android:layout_height="25dp"
+        android:src="@drawable/finger_pinky"
+        android:id="@+id/leftPinkyFinger"
+        android:alpha="0"/>
+
+    <ImageView
+        android:layout_width="25dp"
+        android:layout_height="25dp"
+        android:src="@drawable/finger_thumb"
+        android:id="@+id/leftThumbFinger"
+        android:alpha="0"/>
+
+    <ImageView
+        android:layout_width="80dp"
+        android:layout_height="80dp"
+        android:src="@drawable/hand_left"
+        android:id="@+id/leftHand"
+        android:alpha="0" />
+
+    <ImageView
+        android:layout_width="25dp"
+        android:layout_height="25dp"
+        android:src="@drawable/finger_index"
+        android:id="@+id/rightIndexFinger"
+        android:alpha="0"/>
+
+    <ImageView
+        android:layout_width="25dp"
+        android:layout_height="25dp"
+        android:src="@drawable/finger_middle"
+        android:id="@+id/rightMiddleFinger"
+        android:alpha="0"/>
+
+    <ImageView
+        android:layout_width="25dp"
+        android:layout_height="25dp"
+        android:src="@drawable/finger_ring"
+        android:id="@+id/rightRingFinger"
+        android:alpha="0"/>
+
+    <ImageView
+        android:layout_width="25dp"
+        android:layout_height="25dp"
+        android:src="@drawable/finger_pinky"
+        android:id="@+id/rightPinkyFinger"
+        android:alpha="0"/>
+
+    <ImageView
+        android:layout_width="25dp"
+        android:layout_height="25dp"
+        android:src="@drawable/finger_thumb"
+        android:id="@+id/rightThumbFinger"
+        android:alpha="0"/>
+
+    <ImageView
+        android:layout_width="80dp"
+        android:layout_height="80dp"
+        android:src="@drawable/hand_right"
+        android:id="@+id/rightHand"
+        android:alpha="0" />
+
+    <RelativeLayout
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentRight="true"
+        android:layout_alignParentTop="true"
+        android:id="@+id/tasksLayout">
+
+    </RelativeLayout>
+
+    <CheckBox
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/show_hands"
+        android:id="@+id/showHands"
+        android:layout_alignParentBottom="true"
+        android:layout_alignParentRight="true"
+        android:checked="true" />
+
+    <CheckBox
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/show_log"
+        android:id="@+id/showLog"
+        android:checked="false"
+        android:layout_alignParentBottom="true"
+        android:layout_toLeftOf="@+id/showHands" />
+
+    <Switch
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/left_handed"
+        android:id="@+id/rightHanded"
+        android:checked="true"
+        android:layout_alignParentBottom="true"
+        android:layout_alignParentLeft="true" />
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/right_handed"
+        android:textColor="#ff000000"
+        android:id="@+id/textView2"
+        android:layout_toRightOf="@+id/rightHanded"
+        android:layout_alignTop="@+id/rightHanded"
+        android:layout_alignBottom="@+id/rightHanded"
+        android:gravity="center_vertical" />
+
+    <ImageView
+        android:layout_width="60dp"
+        android:layout_height="60dp"
+        android:src="@drawable/target_cool"
+        android:id="@+id/targetCenter"
+        android:layout_centerVertical="true"
+        android:layout_centerHorizontal="true"
+        android:alpha="0.7"/>
+
+</RelativeLayout>
+<!-- From: file:/home/dhrodriguezg/Mobile_HRI/src/android_hri/mobile_interaction/src/main/res/layout/interface_leapmotion.xml -->

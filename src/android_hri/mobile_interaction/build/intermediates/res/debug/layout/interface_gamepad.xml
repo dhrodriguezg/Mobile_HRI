@@ -1,0 +1,130 @@
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android" xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:ignore="ContentDescription"
+    tools:context=".GamepadActivity"
+    android:orientation="horizontal">
+
+    <org.ros.android.view.RosImageView
+        android:id="@+id/streamingView"
+        android:src="@drawable/loading_wide"
+        android:layout_height="match_parent"
+        android:layout_width="match_parent" />
+
+    <ImageView
+        android:layout_width="50dp"
+        android:layout_height="50dp"
+        android:src="@drawable/target_cool"
+        android:id="@+id/targetView"
+        android:layout_centerVertical="true"
+        android:layout_alignParentRight="true"
+        android:layout_marginRight="120dp"/>
+
+    <ImageView
+        android:id="@+id/virtual_joystick_pos"
+        android:src="@drawable/stick_4c"
+        android:layout_width="100dp"
+        android:layout_height="100dp"
+        android:layout_alignParentBottom="true"
+        android:layout_alignParentLeft="true"
+        android:alpha="0.4"/>
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="30dp"
+        android:textAppearance="?android:attr/textAppearanceSmall"
+        android:text="@string/position_control"
+        android:id="@+id/positionTextView"
+        android:gravity="center_vertical|center_horizontal"
+        android:textColor="#ff3f3f3f"
+        android:layout_gravity="center_vertical"
+        android:layout_alignTop="@+id/virtual_joystick_pos"
+        android:layout_alignParentLeft="true"
+        android:layout_alignRight="@+id/virtual_joystick_pos" />
+
+    <ImageView
+        android:id="@+id/virtual_joystick_rot"
+        android:src="@drawable/stick_4c"
+        android:layout_width="100dp"
+        android:layout_height="100dp"
+        android:layout_alignParentBottom="true"
+        android:layout_alignParentRight="true"
+        android:alpha="0.4"/>
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="30dp"
+        android:textAppearance="?android:attr/textAppearanceSmall"
+        android:text="@string/rotation_control"
+        android:id="@+id/rotationTextView"
+        android:gravity="center_vertical|center_horizontal"
+        android:textColor="#ff3f3f3f"
+        android:layout_gravity="center_vertical"
+        android:layout_alignTop="@+id/virtual_joystick_rot"
+        android:layout_alignParentRight="true"
+        android:layout_alignLeft="@+id/virtual_joystick_rot" />
+
+    <ImageView
+        android:id="@+id/virtual_trigger_close"
+        android:src="@drawable/trigger_4c"
+        android:layout_width="100dp"
+        android:layout_height="70dp"
+        android:layout_alignParentTop="true"
+        android:layout_alignParentLeft="true"
+        android:alpha="0.4"/>
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="30dp"
+        android:textAppearance="?android:attr/textAppearanceSmall"
+        android:text="@string/grasping_close"
+        android:id="@+id/triggerCloseTextView"
+        android:gravity="center_vertical|center_horizontal"
+        android:textColor="#ff3f3f3f"
+        android:layout_gravity="center_vertical"
+        android:layout_below="@+id/virtual_trigger_close"
+        android:layout_alignParentLeft="true" />
+
+    <ImageView
+        android:id="@+id/virtual_trigger_open"
+        android:src="@drawable/trigger_4c"
+        android:layout_width="100dp"
+        android:layout_height="70dp"
+        android:layout_alignParentTop="true"
+        android:layout_alignParentRight="true"
+        android:alpha="0.4"/>
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="30dp"
+        android:textAppearance="?android:attr/textAppearanceSmall"
+        android:text="@string/grasping_open"
+        android:id="@+id/triggerOpenTextView"
+        android:gravity="center_vertical|center_horizontal"
+        android:textColor="#ff3f3f3f"
+        android:layout_gravity="center_vertical"
+        android:layout_below="@+id/virtual_trigger_open"
+        android:layout_alignParentRight="true" />
+
+    <ToggleButton
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textOn="@string/emergency_on"
+        android:textOff="@string/emergency_off"
+        android:textAppearance="?android:attr/textAppearanceMedium"
+        android:id="@+id/emergencyButton"
+        android:layout_alignParentBottom="true"
+        android:layout_centerHorizontal="true"
+        android:checked="false"
+        android:textStyle="bold" />
+
+    <ImageView
+        android:layout_width="60dp"
+        android:layout_height="60dp"
+        android:src="@drawable/target_cool"
+        android:id="@+id/targetCenter"
+        android:layout_centerVertical="true"
+        android:layout_centerHorizontal="true"
+        android:alpha="0.7"/>
+
+</RelativeLayout><!-- From: file:/home/dhrodriguezg/Mobile_HRI/src/android_hri/mobile_interaction/src/main/res/layout/interface_gamepad.xml -->

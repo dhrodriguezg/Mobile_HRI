@@ -1,0 +1,245 @@
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android" xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:ignore="ContentDescription"
+    tools:context=".MainActivity"
+    android:orientation="vertical">
+
+    <LinearLayout
+        android:baselineAligned="false"
+        android:orientation="horizontal"
+        android:layout_width="match_parent"
+        android:layout_height="0px"
+        android:layout_weight="1">
+
+        <TextView
+            android:layout_width="0px"
+            android:layout_height="wrap_content"
+            android:textAppearance="?android:attr/textAppearanceMedium"
+            android:text="@string/ros_master_ip"
+            android:id="@+id/textViewIP"
+            android:layout_weight="3"/>
+
+        <EditText
+            android:layout_width="0px"
+            android:layout_height="wrap_content"
+            android:id="@+id/editIP"
+            android:text="@string/default_master_ip"
+            android:inputType="phone"
+            android:layout_weight="2"/>
+
+        <TextView
+            android:layout_width="0px"
+            android:layout_height="wrap_content"
+            android:textAppearance="?android:attr/textAppearanceMedium"
+            android:text="@string/ros_master_port"
+            android:id="@+id/textViewPort"
+            android:layout_weight="2"/>
+
+        <EditText
+            android:layout_width="0px"
+            android:layout_height="wrap_content"
+            android:inputType="number"
+            android:text="@string/default_master_port"
+            android:ems="10"
+            android:id="@+id/editPort"
+            android:layout_weight="1"/>
+
+        <Button
+            android:layout_width="0px"
+            android:layout_height="wrap_content"
+            android:text="@string/ping"
+            android:id="@+id/pingButton"
+            android:layout_weight="1" />
+
+    </LinearLayout>
+
+    <LinearLayout
+        android:baselineAligned="false"
+        android:orientation="horizontal"
+        android:layout_width="match_parent"
+        android:layout_height="0px"
+        android:layout_weight="1">
+
+        <Button
+            android:layout_width="0px"
+            android:layout_height="wrap_content"
+            android:text="@string/setup"
+            android:id="@+id/calibrationButton"
+            android:layout_gravity="center"
+            android:layout_weight="2" />
+
+        <TextView
+            android:layout_width="0px"
+            android:layout_height="wrap_content"
+            android:textAppearance="?android:attr/textAppearanceMedium"
+            android:text="@string/empty_X3"
+            android:id="@+id/emptySpace"
+            android:layout_weight="1"/>
+
+        <Button
+            android:layout_width="0px"
+            android:layout_height="wrap_content"
+            android:text="@string/camera"
+            android:id="@+id/cameraButton"
+            android:layout_gravity="center"
+            android:layout_weight="2" />
+
+    </LinearLayout>
+
+    <LinearLayout
+        android:baselineAligned="false"
+        android:orientation="horizontal"
+        android:layout_width="match_parent"
+        android:layout_height="0px"
+        android:layout_weight="5">
+
+        <LinearLayout
+            android:orientation="vertical"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_weight="1">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="0px"
+                android:textAppearance="?android:attr/textAppearanceMedium"
+                android:text="@string/interface_screenjoystick_name"
+                android:id="@+id/textViewController"
+                android:layout_gravity="center"
+                android:layout_weight="1"
+                android:gravity="center_vertical|center_horizontal" />
+
+            <ImageView
+                android:layout_width="wrap_content"
+                android:layout_height="0px"
+                android:src="@drawable/interface_1"
+                android:id="@+id/imageViewPreviewController"
+                android:layout_weight="2"
+                android:layout_marginLeft="5dp"
+                android:layout_marginRight="5dp"
+                android:visibility="visible" />
+
+            <Button
+                android:layout_width="wrap_content"
+                android:layout_height="0px"
+                android:text="@string/interface_screenjoystick_number"
+                android:id="@+id/controllerButton"
+                android:layout_gravity="center"
+                android:layout_weight="1"/>
+
+        </LinearLayout>
+
+        <LinearLayout
+            android:orientation="vertical"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_weight="1">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="0px"
+                android:textAppearance="?android:attr/textAppearanceMedium"
+                android:text="@string/interface_directmanipulation_name"
+                android:id="@+id/textViewDragging"
+                android:layout_weight="1"
+                android:layout_gravity="center"
+                android:gravity="center_vertical|center_horizontal" />
+
+            <ImageView
+                android:layout_width="wrap_content"
+                android:layout_height="0px"
+                android:src="@drawable/interface_2"
+                android:id="@+id/imageViewPreviewDragging"
+                android:layout_weight="2"
+                android:layout_marginLeft="5dp"
+                android:layout_marginRight="5dp"
+                android:visibility="visible" />
+
+            <Button
+                android:layout_width="wrap_content"
+                android:layout_height="0px"
+                android:text="@string/interface_directmanipulation_number"
+                android:id="@+id/draggingButton"
+                android:layout_weight="1"
+                android:layout_gravity="center" />
+
+        </LinearLayout>
+
+        <LinearLayout
+            android:orientation="vertical"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_weight="1">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="0px"
+                android:textAppearance="?android:attr/textAppearanceMedium"
+                android:text="@string/interface_gamepad_name"
+                android:id="@+id/textViewGamepad"
+                android:layout_weight="1"
+                android:layout_gravity="center"
+                android:gravity="center_vertical|center_horizontal" />
+
+            <ImageView
+                android:layout_width="wrap_content"
+                android:layout_height="0px"
+                android:src="@drawable/interface_3"
+                android:id="@+id/imageViewPreviewGamepad"
+                android:layout_weight="2"
+                android:layout_marginLeft="5dp"
+                android:layout_marginRight="5dp"
+                android:visibility="visible"
+                android:layout_gravity="center"/>
+
+            <Button
+                android:layout_width="wrap_content"
+                android:layout_height="0px"
+                android:text="@string/interface_gamepad_number"
+                android:id="@+id/gamepadButton"
+                android:layout_weight="1"
+                android:layout_gravity="center" />
+
+        </LinearLayout>
+
+        <LinearLayout
+            android:orientation="vertical"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_weight="1">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="0px"
+                android:textAppearance="?android:attr/textAppearanceMedium"
+                android:text="@string/interface_leapmotion_name"
+                android:id="@+id/textViewLeapMotion"
+                android:layout_weight="1"
+                android:layout_gravity="center"
+                android:gravity="center_vertical|center_horizontal" />
+
+            <ImageView
+                android:layout_width="wrap_content"
+                android:layout_height="0px"
+                android:src="@drawable/interface_4"
+                android:id="@+id/imageViewPreviewLeapMotion"
+                android:layout_weight="2"
+                android:layout_marginLeft="5dp"
+                android:layout_marginRight="5dp"
+                android:visibility="visible"
+                android:layout_gravity="center"/>
+
+            <Button
+                android:layout_width="wrap_content"
+                android:layout_height="0px"
+                android:text="@string/interface_leapmotion_number"
+                android:id="@+id/leapMotionButton"
+                android:layout_weight="1"
+                android:layout_gravity="center" />
+
+        </LinearLayout>
+
+    </LinearLayout>
+
+</LinearLayout>

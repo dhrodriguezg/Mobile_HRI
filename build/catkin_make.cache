@@ -1,0 +1,2 @@
+android_hri
+-DCATKIN_DEVEL_PREFIX=/home/dhrodriguezg/Mobile_HRI/devel -DCMAKE_INSTALL_PREFIX=/home/dhrodriguezg/Mobile_HRI/install -G Unix Makefiles

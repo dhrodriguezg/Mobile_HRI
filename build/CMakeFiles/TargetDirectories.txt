@@ -1,0 +1,12 @@
+/home/dhrodriguezg/Mobile_HRI/build/android_hri/CMakeFiles/_catkin_empty_exported_target.dir
+/home/dhrodriguezg/Mobile_HRI/build/CMakeFiles/clean_test_results.dir
+/home/dhrodriguezg/Mobile_HRI/build/CMakeFiles/clean_test_results_Project.dir
+/home/dhrodriguezg/Mobile_HRI/build/CMakeFiles/download_extra_data.dir
+/home/dhrodriguezg/Mobile_HRI/build/CMakeFiles/doxygen.dir
+/home/dhrodriguezg/Mobile_HRI/build/android_hri/CMakeFiles/gradle-android_hri.dir
+/home/dhrodriguezg/Mobile_HRI/build/android_hri/CMakeFiles/gradle-clean.dir
+/home/dhrodriguezg/Mobile_HRI/build/android_hri/CMakeFiles/gradle-clean-android_hri.dir
+/home/dhrodriguezg/Mobile_HRI/build/gtest/CMakeFiles/gtest.dir
+/home/dhrodriguezg/Mobile_HRI/build/gtest/CMakeFiles/gtest_main.dir
+/home/dhrodriguezg/Mobile_HRI/build/CMakeFiles/run_tests.dir
+/home/dhrodriguezg/Mobile_HRI/build/CMakeFiles/tests.dir

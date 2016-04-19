@@ -1,0 +1,8 @@
+prefix=/home/dhrodriguezg/Mobile_HRI/install
+
+Name: android_hri
+Description: Description of android_hri
+Version: 0.1.0
+Cflags: 
+Libs: -L/home/dhrodriguezg/Mobile_HRI/install/lib 
+Requires: 

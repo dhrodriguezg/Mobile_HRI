@@ -1,0 +1,7 @@
+set(_CATKIN_CURRENT_PACKAGE "android_hri")
+set(android_hri_MAINTAINER "dhrodriguezg <dhrodriguezg@todo.todo>")
+set(android_hri_DEPRECATED "")
+set(android_hri_VERSION "0.1.0")
+set(android_hri_BUILD_DEPENDS "android_core" "rosjava_build_tools" "rosjava_core" "std_msgs")
+set(android_hri_RUN_DEPENDS )
+set(android_hri_BUILDTOOL_DEPENDS "catkin")

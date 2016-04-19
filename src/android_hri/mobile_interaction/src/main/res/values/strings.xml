@@ -1,0 +1,139 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <!-- GLOBAL TEXT -->
+    <string name="spanish">Español</string>
+    <string name="english">English</string>
+    <string name="emergency_off">EMERGENCY STOP</string>
+    <string name="emergency_on">STOPPING ROBOT</string>
+    <string name="emergency_on_msg">EMERGENCY STOP ACTIVATED!</string>
+    <string name="emergency_off_msg">EMERGENCY STOP DEACTIVATED!</string>
+    <string name="max_target_speed">0.3</string>
+
+    <!-- MAIN TEXT -->
+    <string name="app_name">Mobile Android Interface</string>
+    <string name="ros_master_ip">ROS Master Address:</string>
+    <string name="ros_master_port">ROS Master Port:</string>
+    <string name="default_master_ip">85.6.28.1</string>
+    <string name="default_master_port">11311</string>
+    <string name="ping">Ping</string>
+    <string name="setup">Setup</string>
+    <string name="camera">Camera</string>
+    <string name="interface_screenjoystick_name">Screen Joysticks</string>
+    <string name="interface_screenjoystick_number">Interface 1</string>
+    <string name="interface_directmanipulation_name">Direct Manipulation</string>
+    <string name="interface_directmanipulation_number">Interface 2</string>
+    <string name="interface_gamepad_name">Gamepad</string>
+    <string name="interface_gamepad_number">Interface 3</string>
+    <string name="interface_leapmotion_name">Leap Motion</string>
+    <string name="interface_leapmotion_number">Interface 4</string>
+
+    <!-- SETUP TEXT -->
+    <string name="empty"></string>
+    <string name="empty_X3">   </string>
+    <string name="short_pos1">Pos. 1</string>
+    <string name="short_pos2">Pos. 2</string>
+    <string name="spread">Spread</string>
+    <string name="grasp">Grasp</string>
+    <string name="start">Start</string>
+    <string name="finish">Finish</string>
+    <string name="quick">QS</string>
+    <string name="enable">Enable</string>
+    <string name="disable">Disable</string>
+    <string name="confirm_point">Confirm Point</string>
+    <string name="task_position_msg">Going to Task position</string>
+    <string name="initial_position_msg">Going to Initial position</string>
+    <string name="quick_position_msg">Quick Task position</string>
+
+    <!-- DIRECTMANIPULATION TEXT -->
+    <string name="rotating">Rotating</string>
+    <string name="moving">Moving</string>
+    <string name="grasping">Grasping</string>
+    <string name="move_msg">Moving to</string>
+    <string name="rotate_msg">Rotating Jaw</string>
+    <string name="grasp_msg">Grasping</string>
+
+    <!-- SCREENJOYSTICK TEXT -->
+    <string name="open_hand">Open H.</string>
+    <string name="close_hand">Close H.</string>
+
+    <!-- GAMEPAD TEXT -->
+    <string name="position_control">2D Position</string>
+    <string name="rotation_control">1D Rotation</string>
+    <string name="grasping_open">Open Grasping</string>
+    <string name="grasping_close">Close Grasping</string>
+    <string name="gamepad_on_msg">Gamepad FOUND!</string>
+    <string name="gamepad_off_msg">Gamepad NOT found! Leaving activity...</string>
+
+    <!-- LEAPMOTION TEXT -->
+    <string name="status"> :Status</string>
+    <string name="status_fail">No Hands!</string>
+    <string name="status_ok">OK!</string>
+    <string name="tracking">Tracking: </string>
+    <string name="show_hands">Show Hands</string>
+    <string name="show_log">Show Log</string>
+    <string name="left_handed">Left-Handed</string>
+    <string name="right_handed">Right-Handed</string>
+    <string name="tracking_activated">Tracking activated</string>
+    <string name="tracking_deactivated">Tracking deactivated</string>
+    <string name="initialized">Initialized</string>
+    <string name="connected">Connected</string>
+    <string name="disconnected">Disconnected</string>
+    <string name="exited">Exited</string>
+    <string name="hands">Hands</string>
+    <string name="fingers">fingers</string>
+    <string name="rightHand">Right</string>
+    <string name="leftHand">Left</string>
+    <string name="actionHand">Action Hand</string>
+    <string name="taskHand">Task Hand</string>
+    <string name="selectTask">Select Task</string>
+    <string name="moveTask">Move Task</string>
+    <string name="rotateTask">Rotate Task</string>
+    <string name="graspTask">GraspInv Task</string>
+    <string name="distances">Distances (I,M,R,P,T)</string>
+    <string name="palm">Palm</string>
+    <string name="wrist">Wrist:  </string>
+    <string name="index">Index:  </string>
+    <string name="middle">Middle: </string>
+    <string name="ring">Ring:   </string>
+    <string name="pinky">Pinky:  </string>
+    <string name="thumb">Thumb:  </string>
+    <string name="task">Task</string>
+    <string name="taskNaN">Task: -1 (not valid)</string>
+    <string name="task5">Task: 5 (open hand, no task)</string>
+    <string name="task6">Task: 6 (confirm)</string>
+
+    <!-- GLOBAL VALUES -->
+    <string name="workspace_xoffset">0.5544</string>
+    <string name="workspace_width">1.0123</string>
+    <string name="workspace_yoffset">0.8652</string>
+    <string name="workspace_height">0.5567</string>
+
+    <string name="topic_streaming">"/usb_cam/image_raw/compressed"</string>
+    <string name="topic_streaming_msg">sensor_msgs/CompressedImage</string>
+    <string name="topic_emergencystop">/android/emergency_stop</string>
+    <string name="topic_interfacenumber">/android/interface_number</string>
+
+    <string name="topic_rosariavel">/RosAria/cmd_vel</string>
+    <string name="topic_positionrel">/android/position_rel</string>
+    <string name="topic_positionabs">/android/position_abs</string>
+    <string name="topic_rotationrel">/android/rotation_rel</string>
+    <string name="topic_rotationabs">/android/rotation_abs</string>
+    <string name="topic_graspingrel">/android/grasping_rel</string>`
+    <string name="topic_graspingabs">/android/grasping_abs</string>
+
+    <string name="topic_trackerpoint">/android/tracker_point</string>
+    <string name="topic_targetpoint">/android/target_point</string>
+
+    <string name="topic_lmlog">/android/lmlog</string>
+    <string name="topic_setup_on">/android/setup/on</string>
+    <string name="topic_setup_off">/android/setup/off</string>
+    <string name="topic_setup_quick">/android/setup/quick</string>
+    <string name="topic_setup_pos1state">/android/setup/pos1_state</string>
+    <string name="topic_setup_pos2state">/android/setup/pos2_state</string>
+    <string name="topic_setup_grasp">/android/setup/grasp_state</string>
+    <string name="topic_setup_spread">/android/setup/spread_state</string>
+
+    <string name="service_test">/android/test_service</string>
+
+</resources>

@@ -1,0 +1,64 @@
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android" xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:ignore="ContentDescription"
+    tools:context=".DraggingActivity"
+    android:orientation="horizontal">
+
+    <org.ros.android.view.RosImageView
+        android:id="@+id/streamingView"
+        android:layout_height="match_parent"
+        android:layout_width="match_parent"
+        android:src="@drawable/loading_wide" />
+
+    <ImageView
+        android:layout_width="50dp"
+        android:layout_height="50dp"
+        android:src="@drawable/target"
+        android:id="@+id/positionView"
+        android:layout_centerVertical="true"
+        android:layout_alignParentRight="true"
+        android:layout_marginRight="120dp"
+        android:alpha="0.3" />
+
+    <ImageView
+        android:layout_width="50dp"
+        android:layout_height="50dp"
+        android:src="@drawable/target_cool"
+        android:id="@+id/targetView"
+        android:layout_centerVertical="true"
+        android:layout_alignParentRight="true"
+        android:layout_marginRight="120dp" />
+
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:textAppearance="?android:attr/textAppearanceMedium"
+        android:text=""
+        android:id="@+id/msgTextView"
+        android:layout_alignParentLeft="true"
+        android:gravity="center_horizontal" />
+
+
+    <ToggleButton
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textOn="@string/emergency_on"
+        android:textOff="@string/emergency_off"
+        android:textAppearance="?android:attr/textAppearanceMedium"
+        android:id="@+id/emergencyButton"
+        android:layout_alignParentBottom="true"
+        android:layout_centerHorizontal="true"
+        android:checked="false"
+        android:textStyle="bold" />
+
+    <ImageView
+        android:layout_width="60dp"
+        android:layout_height="60dp"
+        android:src="@drawable/target_cool"
+        android:id="@+id/targetCenter"
+        android:layout_centerVertical="true"
+        android:layout_centerHorizontal="true"
+        android:alpha="0.7"/>
+
+</RelativeLayout>

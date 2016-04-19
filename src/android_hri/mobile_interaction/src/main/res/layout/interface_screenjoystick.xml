@@ -1,0 +1,138 @@
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android" xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:ignore="ContentDescription"
+    tools:context="uniandes.disc.imagine.android_hri.mobile_interaction"
+    android:orientation="horizontal">
+
+    <org.ros.android.view.RosImageView
+        android:id="@+id/streamingView"
+        android:src="@drawable/loading_wide"
+        android:layout_height="match_parent"
+        android:layout_width="match_parent" />
+
+    <ImageView
+        android:layout_width="50dp"
+        android:layout_height="50dp"
+        android:src="@drawable/target_cool"
+        android:id="@+id/targetView"
+        android:layout_centerVertical="true"
+        android:layout_alignParentRight="true"
+        android:layout_marginRight="120dp"/>
+
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+
+        <uniandes.disc.imagine.android_hri.mobile_interaction.widget.VerticalSliderView
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:id="@+id/sliderView"
+            android:layout_alignParentTop="true"
+            android:layout_alignParentLeft="true"
+            android:layout_above="@+id/virtual_joystick_pos"
+            android:layout_alignRight="@+id/virtual_joystick_pos"
+            android:gravity="center_vertical|center_horizontal"
+            android:layout_marginTop="10dp"
+            android:layout_marginBottom="10dp"
+            android:layout_marginRight="30dp"
+            android:layout_marginLeft="30dp"
+            android:visibility="gone" />
+
+        <uniandes.disc.imagine.android_hri.mobile_interaction.widget.CustomVirtualJoystickView
+            android:id="@+id/virtual_joystick_pos"
+            android:layout_width="120dp"
+            android:layout_height="120dp"
+            android:layout_alignParentBottom="true"
+            android:layout_alignParentLeft="true" />
+
+        <uniandes.disc.imagine.android_hri.mobile_interaction.widget.CustomVirtualJoystickView
+            android:id="@+id/virtual_joystick_rot"
+            android:layout_width="120dp"
+            android:layout_height="120dp"
+            android:layout_alignParentBottom="true"
+            android:layout_alignParentRight="true" />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="30dp"
+            android:textAppearance="?android:attr/textAppearanceSmall"
+            android:text="@string/rotation_control"
+            android:id="@+id/rotationTextView"
+            android:layout_alignTop="@+id/virtual_joystick_rot"
+            android:layout_alignLeft="@+id/virtual_joystick_rot"
+            android:layout_alignParentRight="true"
+            android:gravity="center_vertical|center_horizontal"
+            android:textColor="#ffd9d9d9" />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="30dp"
+            android:textAppearance="?android:attr/textAppearanceSmall"
+            android:text="@string/position_control"
+            android:id="@+id/positionTextView"
+            android:gravity="center_vertical|center_horizontal"
+            android:textColor="#ffd9d9d9"
+            android:layout_gravity="center_vertical"
+            android:layout_alignTop="@+id/virtual_joystick_pos"
+            android:layout_alignParentLeft="true"
+            android:layout_alignRight="@+id/virtual_joystick_pos" />
+
+        <ToggleButton
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textOn="@string/emergency_on"
+            android:textOff="@string/emergency_off"
+            android:textAppearance="?android:attr/textAppearanceMedium"
+            android:id="@+id/emergencyButton"
+            android:layout_alignParentBottom="true"
+            android:layout_centerHorizontal="true"
+            android:checked="false"
+            android:textStyle="bold" />
+
+        <ImageView
+            android:layout_width="wrap_content"
+            android:layout_height="30dp"
+            android:id="@+id/imageHandClose"
+            android:src="@drawable/hand_close"
+            android:alpha="0.8"
+            android:layout_alignParentTop="true"
+            android:layout_alignParentRight="true"
+            android:layout_alignLeft="@+id/virtual_joystick_rot"
+            android:layout_marginLeft="25dp"
+            android:layout_marginRight="25dp"/>
+
+        <uniandes.disc.imagine.android_hri.mobile_interaction.widget.ScrollerView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:id="@+id/scrollerView"
+            android:alpha="0.8"
+            android:layout_above="@+id/imageHandOpen"
+            android:layout_alignLeft="@+id/imageHandClose"
+            android:layout_below="@+id/imageHandClose"
+            android:layout_alignRight="@+id/imageHandClose" />
+
+        <ImageView
+            android:layout_width="wrap_content"
+            android:layout_height="30dp"
+            android:id="@+id/imageHandOpen"
+            android:src="@drawable/hand_open"
+            android:alpha="0.8"
+            android:layout_above="@+id/virtual_joystick_rot"
+            android:layout_alignParentRight="true"
+            android:layout_alignLeft="@+id/virtual_joystick_rot"
+            android:layout_marginLeft="25dp"
+            android:layout_marginRight="25dp" />
+
+    </RelativeLayout>
+
+    <ImageView
+        android:layout_width="60dp"
+        android:layout_height="60dp"
+        android:src="@drawable/target_cool"
+        android:id="@+id/targetCenter"
+        android:layout_centerVertical="true"
+        android:layout_centerHorizontal="true"
+        android:alpha="0.7"/>
+
+</RelativeLayout>
