@@ -3,7 +3,6 @@
  * The changes include:
  * -It allows the user to choose the camera resolution (it no longer depends on the Layout size)
  * -It doesn't need a listener to convert the stream.
- * -All deprecated objects and methods were replaced.
  */
 
 /*
@@ -25,6 +24,7 @@
 package uniandes.disc.imagine.android_hri.mobile_interaction.widget;
 
 import android.content.Context;
+import android.graphics.Color;
 import android.graphics.ImageFormat;
 import android.graphics.Rect;
 import android.graphics.YuvImage;
@@ -32,6 +32,7 @@ import android.hardware.Camera;
 import android.hardware.Camera.PreviewCallback;
 import android.hardware.Camera.Size;
 import android.util.AttributeSet;
+import android.util.Log;
 import android.view.SurfaceHolder;
 import android.view.SurfaceView;
 import android.view.View;
@@ -60,7 +61,8 @@ public class CustomCameraView extends ViewGroup {
     private Camera camera;
     private Size previewSize;
     private byte[] previewBuffer;
-
+    private int cameraId;
+    private SurfaceView surfaceView;
     private byte[] rawImageBuffer;
     private Size rawImageSize;
     private YuvImage yuvImage;
@@ -68,6 +70,7 @@ public class CustomCameraView extends ViewGroup {
     private ChannelBufferOutputStream stream;
     private ChannelBuffer image;
     private boolean imageChanged;
+    private List<Size> supportedSizes;
 
     private int width;
     private int height;
@@ -102,11 +105,14 @@ public class CustomCameraView extends ViewGroup {
     }
 
     private void init(Context context) {
-        SurfaceView surfaceView = new SurfaceView(context);
+        surfaceView = new SurfaceView(context);
+        setBackgroundColor(Color.BLACK);
         addView(surfaceView);
+
         surfaceHolder = surfaceView.getHolder();
         surfaceHolder.addCallback(new SurfaceHolderCallback());
         surfaceHolder.setType(SurfaceHolder.SURFACE_TYPE_PUSH_BUFFERS);
+
         bufferingPreviewCallback = new BufferingPreviewCallback();
         stream = new ChannelBufferOutputStream(MessageBuffers.dynamicBuffer());
     }
@@ -136,8 +142,32 @@ public class CustomCameraView extends ViewGroup {
         stream.buffer().clear();
     }
 
+    public void setPreviewSize(Size previewSize) {
+        this.previewSize = previewSize;
+    }
+
+    public Camera getCamera() {
+        return camera;
+    }
+
     public Size getPreviewSize() {
         return previewSize;
+    }
+
+    public void updateCamera(){
+        releaseCamera();
+        selectCamera(cameraId);
+    }
+
+    public List<Size> selectCamera(int id){
+        cameraId=id;
+        int numberOfCameras = Camera.getNumberOfCameras();
+
+        if (numberOfCameras > 1)
+            cameraId = cameraId % numberOfCameras;
+        releaseCamera();
+        setCamera(Camera.open(cameraId));
+        return supportedSizes;
     }
 
     public void setCamera(Camera camera) {
@@ -156,9 +186,8 @@ public class CustomCameraView extends ViewGroup {
 
     private void setupCameraParameters() {
         Camera.Parameters parameters = camera.getParameters();
-        List<Size> supportedPreviewSizes = parameters.getSupportedPreviewSizes();
-        //previewSize = getOptimalPreviewSize(supportedPreviewSizes, getWidth(), getHeight());
-        previewSize = getOptimalPreviewSize(supportedPreviewSizes, width, height);
+        supportedSizes = parameters.getSupportedPreviewSizes();
+        previewSize = getOptimalPreviewSize(supportedSizes, width, height);
         parameters.setPreviewSize(previewSize.width, previewSize.height);
         parameters.setPreviewFormat(ImageFormat.NV21);
         camera.setParameters(parameters);
@@ -208,6 +237,10 @@ public class CustomCameraView extends ViewGroup {
     public void setResolution(int width, int height) {
         this.width=width;
         this.height=height;
+
+        float screenRatio=(float)getWidth()/(float)getHeight();
+        float resolutionRatio=(float)width/(float)height;
+        surfaceView.setScaleX(resolutionRatio/screenRatio);
     }
 
     @Override
