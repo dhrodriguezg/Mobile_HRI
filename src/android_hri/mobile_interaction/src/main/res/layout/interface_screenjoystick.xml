@@ -18,7 +18,8 @@
         android:id="@+id/targetView"
         android:layout_centerVertical="true"
         android:layout_alignParentRight="true"
-        android:layout_marginRight="120dp"/>
+        android:layout_marginRight="120dp"
+        android:visibility="invisible" />
 
     <RelativeLayout
         android:layout_width="match_parent"
@@ -69,7 +70,7 @@
             android:layout_width="wrap_content"
             android:layout_height="30dp"
             android:textAppearance="?android:attr/textAppearanceSmall"
-            android:text="@string/position_control"
+            android:text="@string/total_control"
             android:id="@+id/positionTextView"
             android:gravity="center_vertical|center_horizontal"
             android:textColor="#ffd9d9d9"
@@ -81,6 +82,143 @@
         <ToggleButton
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:id="@+id/toggleCamera1"
+            android:textOn="@string/camera1_name"
+            android:textOff="@string/camera1_name"
+            android:checked="true"
+            android:layout_alignLeft="@+id/virtual_joystick_rot"
+            android:layout_alignParentRight="true"
+            android:layout_marginTop="5dp" />
+
+        <ToggleButton
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:id="@+id/toggleCamera2"
+            android:textOn="@string/camera2_name"
+            android:textOff="@string/camera2_name"
+            android:checked="false"
+            android:layout_below="@+id/toggleCamera1"
+            android:layout_alignParentRight="true"
+            android:layout_alignLeft="@+id/toggleCamera1"
+            android:layout_marginTop="5dp" />
+
+
+        <ToggleButton
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:id="@+id/toggleCamera3"
+            android:textOn="@string/camera3_name"
+            android:textOff="@string/camera3_name"
+            android:checked="false"
+            android:layout_below="@+id/toggleCamera2"
+            android:layout_alignParentRight="true"
+            android:layout_alignLeft="@+id/toggleCamera1"
+            android:layout_marginTop="5dp" />
+
+
+        <ToggleButton
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:id="@+id/toggleCamera4"
+            android:textOn="@string/camera4_name"
+            android:textOff="@string/camera4_name"
+            android:checked="false"
+            android:layout_below="@+id/toggleCamera3"
+            android:layout_alignParentRight="true"
+            android:layout_alignLeft="@+id/toggleCamera1"
+            android:layout_marginTop="5dp" />
+
+        <ImageView
+            android:layout_width="30dp"
+            android:layout_height="45dp"
+            android:id="@+id/imageAll"
+            android:src="@drawable/all_control"
+            android:layout_alignParentTop="true"
+            android:layout_alignParentLeft="true"
+            android:layout_marginTop="5dp"
+            android:layout_marginLeft="2dp"/>
+
+        <ToggleButton
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textOn="@string/all_control"
+            android:textOff="@string/all_control"
+            android:checked="true"
+            android:id="@+id/toggleAllControl"
+            android:layout_toRightOf="@+id/imageAll"
+            android:layout_alignTop="@+id/imageAll"
+            android:layout_alignBottom="@+id/imageAll"
+            android:layout_alignRight="@+id/virtual_joystick_pos"/>
+
+        <ImageView
+            android:layout_width="wrap_content"
+            android:layout_height="45dp"
+            android:id="@+id/imageSimulator"
+            android:src="@drawable/sim_control"
+            android:layout_below="@+id/imageAll"
+            android:layout_alignLeft="@+id/imageAll"
+            android:layout_alignRight="@+id/imageAll"
+            android:layout_marginTop="5dp"/>
+
+        <ToggleButton
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textOn="@string/sim_control"
+            android:textOff="@string/sim_control"
+            android:checked="false"
+            android:id="@+id/toggleSimulatorControl"
+            android:layout_toRightOf="@+id/imageSimulator"
+            android:layout_alignTop="@+id/imageSimulator"
+            android:layout_alignBottom="@+id/imageSimulator"
+            android:layout_alignRight="@+id/virtual_joystick_pos"/>
+
+        <ImageView
+            android:layout_width="wrap_content"
+            android:layout_height="45dp"
+            android:id="@+id/imageP3DX1"
+            android:src="@drawable/p3dx1_control"
+            android:layout_below="@+id/imageSimulator"
+            android:layout_alignLeft="@+id/imageSimulator"
+            android:layout_alignRight="@+id/imageSimulator"
+            android:layout_marginTop="5dp"/>
+
+        <ToggleButton
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textOn="@string/p3dx1_control"
+            android:textOff="@string/p3dx1_control"
+            android:checked="false"
+            android:id="@+id/toggleP3DX1Control"
+            android:layout_toRightOf="@+id/imageP3DX1"
+            android:layout_alignTop="@+id/imageP3DX1"
+            android:layout_alignBottom="@+id/imageP3DX1"
+            android:layout_alignRight="@+id/virtual_joystick_pos"/>
+
+        <ImageView
+            android:layout_width="wrap_content"
+            android:layout_height="45dp"
+            android:id="@+id/imageP3DX2"
+            android:src="@drawable/p3dx2_control"
+            android:layout_below="@+id/imageP3DX1"
+            android:layout_alignLeft="@+id/imageP3DX1"
+            android:layout_alignRight="@+id/imageP3DX1"
+            android:layout_marginTop="5dp"/>
+
+        <ToggleButton
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textOn="@string/p3dx2_control"
+            android:textOff="@string/p3dx2_control"
+            android:checked="false"
+            android:id="@+id/toggleP3DX2Control"
+            android:layout_toRightOf="@+id/imageP3DX2"
+            android:layout_alignTop="@+id/imageP3DX2"
+            android:layout_alignBottom="@+id/imageP3DX2"
+            android:layout_alignRight="@+id/virtual_joystick_pos"/>
+
+        <ToggleButton
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
             android:textOn="@string/emergency_on"
             android:textOff="@string/emergency_off"
             android:textAppearance="?android:attr/textAppearanceMedium"
@@ -88,41 +226,7 @@
             android:layout_alignParentBottom="true"
             android:layout_centerHorizontal="true"
             android:checked="false"
-            android:textStyle="bold" />
-
-        <ImageView
-            android:layout_width="wrap_content"
-            android:layout_height="30dp"
-            android:id="@+id/imageHandClose"
-            android:src="@drawable/hand_close"
-            android:alpha="0.8"
-            android:layout_alignParentTop="true"
-            android:layout_alignParentRight="true"
-            android:layout_alignLeft="@+id/virtual_joystick_rot"
-            android:layout_marginLeft="25dp"
-            android:layout_marginRight="25dp"/>
-
-        <uniandes.disc.imagine.android_hri.mobile_interaction.widget.ScrollerView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:id="@+id/scrollerView"
-            android:alpha="0.8"
-            android:layout_above="@+id/imageHandOpen"
-            android:layout_alignLeft="@+id/imageHandClose"
-            android:layout_below="@+id/imageHandClose"
-            android:layout_alignRight="@+id/imageHandClose" />
-
-        <ImageView
-            android:layout_width="wrap_content"
-            android:layout_height="30dp"
-            android:id="@+id/imageHandOpen"
-            android:src="@drawable/hand_open"
-            android:alpha="0.8"
-            android:layout_above="@+id/virtual_joystick_rot"
-            android:layout_alignParentRight="true"
-            android:layout_alignLeft="@+id/virtual_joystick_rot"
-            android:layout_marginLeft="25dp"
-            android:layout_marginRight="25dp" />
+            android:textStyle="bold"/>
 
     </RelativeLayout>
 
@@ -133,6 +237,7 @@
         android:id="@+id/targetCenter"
         android:layout_centerVertical="true"
         android:layout_centerHorizontal="true"
-        android:alpha="0.7"/>
+        android:alpha="0.7"
+        android:visibility="invisible" />
 
 </RelativeLayout>

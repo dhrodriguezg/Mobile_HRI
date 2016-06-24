@@ -45,16 +45,25 @@ public class ScreenJoystickInterface extends RosActivity {
     private CustomVirtualJoystickView joystickRotationNodeMain;
     private RosImageView<CompressedImage> imageStreamNodeMain;
 
+    private ToggleButton toggleCamera1;
+    private ToggleButton toggleCamera2;
+    private ToggleButton toggleCamera3;
+    private ToggleButton toggleCamera4;
+    private ToggleButton toggleAllControl;
+    private ToggleButton toggleSimulatorControl;
+    private ToggleButton toggleP3DX1Control;
+    private ToggleButton toggleP3DX2Control;
+
     private AndroidNode androidNode;
     private BooleanTopic emergencyTopic;
     private Int32Topic interfaceNumberTopic;
+    private Int32Topic cameraNumberTopic;
+    private Int32Topic cameraPTZTopic;
+    private Int32Topic p3dxNumberTopic;
     private TwistTopic velocityTopic;
 
     private ImageView targetImage;
-    private ImageView openHand;
-    private ImageView closeHand;
 
-    private ScrollerView graspHandler = null;
     private boolean running=true;
     private float maxTargetSpeed;
 
@@ -72,8 +81,7 @@ public class ScreenJoystickInterface extends RosActivity {
         getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
 
         maxTargetSpeed=TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, Float.parseFloat(getString(R.string.max_target_speed)), getResources().getDisplayMetrics());
-        openHand = (ImageView) findViewById(R.id.imageHandOpen);
-        closeHand = (ImageView) findViewById(R.id.imageHandClose);
+
 
         joystickPositionNodeMain = (CustomVirtualJoystickView) findViewById(R.id.virtual_joystick_pos);
         joystickRotationNodeMain = (CustomVirtualJoystickView) findViewById(R.id.virtual_joystick_rot);
@@ -84,11 +92,27 @@ public class ScreenJoystickInterface extends RosActivity {
 
         velocityTopic =  new TwistTopic();
         velocityTopic.publishTo(getString(R.string.topic_rosariavel), false, 10);
+        velocityTopic.setPublishingFreq(100);
 
         interfaceNumberTopic = new Int32Topic();
         interfaceNumberTopic.publishTo(getString(R.string.topic_interfacenumber), true, 0);
         interfaceNumberTopic.setPublishingFreq(100);
         interfaceNumberTopic.setPublisher_int(2);
+
+        cameraNumberTopic = new Int32Topic();
+        cameraNumberTopic.publishTo(getString(R.string.topic_camera_number), false, 10);
+        cameraNumberTopic.setPublishingFreq(10);
+        cameraNumberTopic.setPublisher_int(0);
+
+        cameraPTZTopic = new Int32Topic();
+        cameraPTZTopic.publishTo(getString(R.string.topic_camera_ptz), false, 10);
+        cameraPTZTopic.setPublishingFreq(10);
+        cameraPTZTopic.setPublisher_int(-1);
+
+        p3dxNumberTopic = new Int32Topic();
+        p3dxNumberTopic.publishTo(getString(R.string.topic_p3dx_number), false, 10);
+        p3dxNumberTopic.setPublishingFreq(10);
+        p3dxNumberTopic.setPublisher_int(-1);
 
         emergencyTopic = new BooleanTopic();
         emergencyTopic.publishTo(getString(R.string.topic_emergencystop), true, 0);
@@ -96,21 +120,22 @@ public class ScreenJoystickInterface extends RosActivity {
         emergencyTopic.setPublisher_bool(true);
 
         androidNode = new AndroidNode(NODE_NAME);
-        androidNode.addTopics(emergencyTopic, velocityTopic, interfaceNumberTopic);
+        androidNode.addTopics(emergencyTopic, velocityTopic, interfaceNumberTopic, cameraNumberTopic, cameraPTZTopic, p3dxNumberTopic);
         androidNode.addNodeMain(imageStreamNodeMain);
 
-        graspHandler = (ScrollerView) findViewById(R.id.scrollerView);
-        graspHandler.setTopValue(0.f);
-        graspHandler.setBottomValue(2.f);
-        graspHandler.setFontSize(13);
-        graspHandler.setMaxTotalItems(8);
-        graspHandler.setMaxVisibleItems(7);
-        graspHandler.beginAtBottom();
-        graspHandler.showPercentage();
         //In case you still need to publish the virtualjoysticks values, set the topicname and then add the joysticks to the AndroidNode
         //joystickPositionNodeMain.setTopicName(JOYPOS_TOPIC);
         //joystickRotationNodeMain.setTopicName(JOYROT_TOPIC);
         //androidNode.addNodeMains(joystickPositionNodeMain,joystickRotationNodeMain);
+
+        toggleCamera1 = (ToggleButton)findViewById(R.id.toggleCamera1);
+        toggleCamera2 = (ToggleButton)findViewById(R.id.toggleCamera2);
+        toggleCamera3 = (ToggleButton)findViewById(R.id.toggleCamera3);
+        toggleCamera4 = (ToggleButton)findViewById(R.id.toggleCamera4);
+        toggleAllControl = (ToggleButton)findViewById(R.id.toggleAllControl);
+        toggleSimulatorControl = (ToggleButton)findViewById(R.id.toggleSimulatorControl);
+        toggleP3DX1Control = (ToggleButton)findViewById(R.id.toggleP3DX1Control);
+        toggleP3DX2Control = (ToggleButton)findViewById(R.id.toggleP3DX2Control);
 
         targetImage = (ImageView) findViewById(R.id.targetView);
 
@@ -127,17 +152,139 @@ public class ScreenJoystickInterface extends RosActivity {
         });
 
         ToggleButton emergencyStop = (ToggleButton)findViewById(R.id.emergencyButton) ;
-        emergencyStop.setOnCheckedChangeListener( new CompoundButton.OnCheckedChangeListener() {
+        emergencyStop.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
             @Override
             public void onCheckedChanged(CompoundButton toggleButton, boolean isChecked) {
-                if(isChecked){
+                if (isChecked) {
                     Toast.makeText(getApplicationContext(), getString(R.string.emergency_on_msg), Toast.LENGTH_LONG).show();
                     imageStreamNodeMain.setBackgroundColor(Color.RED);
                     emergencyTopic.setPublisher_bool(false);
-                }else{
+                } else {
                     Toast.makeText(getApplicationContext(), getString(R.string.emergency_off_msg), Toast.LENGTH_LONG).show();
                     imageStreamNodeMain.setBackgroundColor(Color.TRANSPARENT);
                     emergencyTopic.setPublisher_bool(true);
+                }
+            }
+        });
+
+
+
+        toggleCamera1.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+            @Override
+            public void onCheckedChanged(CompoundButton toggleButton, boolean isChecked) {
+                if (isChecked) {
+                    Toast.makeText(getApplicationContext(), "Camera: Simulation", Toast.LENGTH_SHORT).show();
+                    toggleCamera1.setChecked(true);
+                    toggleCamera2.setChecked(false);
+                    toggleCamera3.setChecked(false);
+                    toggleCamera4.setChecked(false);
+                    cameraNumberTopic.setPublisher_int(0);
+                    cameraNumberTopic.publishNow();
+                }
+            }
+        });
+
+        toggleCamera2.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+            @Override
+            public void onCheckedChanged(CompoundButton toggleButton, boolean isChecked) {
+                if (isChecked) {
+                    Toast.makeText(getApplicationContext(), "Camera: Top-Down", Toast.LENGTH_SHORT).show();
+                    toggleCamera1.setChecked(false);
+                    toggleCamera2.setChecked(true);
+                    toggleCamera3.setChecked(false);
+                    toggleCamera4.setChecked(false);
+                    cameraNumberTopic.setPublisher_int(1);
+                    cameraNumberTopic.publishNow();
+                }
+            }
+        });
+
+        toggleCamera3.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+            @Override
+            public void onCheckedChanged(CompoundButton toggleButton, boolean isChecked) {
+                if (isChecked) {
+                    Toast.makeText(getApplicationContext(), "Camera: First Person", Toast.LENGTH_SHORT).show();
+                    toggleCamera1.setChecked(false);
+                    toggleCamera2.setChecked(false);
+                    toggleCamera3.setChecked(true);
+                    toggleCamera4.setChecked(false);
+                    cameraNumberTopic.setPublisher_int(2);
+                    cameraNumberTopic.publishNow();
+                }
+            }
+        });
+
+        toggleCamera4.setOnCheckedChangeListener( new CompoundButton.OnCheckedChangeListener() {
+            @Override
+            public void onCheckedChanged(CompoundButton toggleButton, boolean isChecked) {
+                if(isChecked){
+                    Toast.makeText(getApplicationContext(), "Camera: Web Cam", Toast.LENGTH_SHORT).show();
+                    toggleCamera1.setChecked(false);
+                    toggleCamera2.setChecked(false);
+                    toggleCamera3.setChecked(false);
+                    toggleCamera4.setChecked(true);
+                    cameraNumberTopic.setPublisher_int(3);
+                    cameraNumberTopic.publishNow();
+                }
+            }
+        });
+
+        toggleAllControl.setOnCheckedChangeListener( new CompoundButton.OnCheckedChangeListener() {
+            @Override
+            public void onCheckedChanged(CompoundButton toggleButton, boolean isChecked) {
+                if(isChecked){
+                    Toast.makeText(getApplicationContext(), "Control: ALL", Toast.LENGTH_SHORT).show();
+                    toggleAllControl.setChecked(true);
+                    toggleSimulatorControl.setChecked(false);
+                    toggleP3DX1Control.setChecked(false);
+                    toggleP3DX2Control.setChecked(false);
+                    p3dxNumberTopic.setPublisher_int(-1);
+                    p3dxNumberTopic.publishNow();
+                }
+            }
+        });
+
+        toggleSimulatorControl.setOnCheckedChangeListener( new CompoundButton.OnCheckedChangeListener() {
+            @Override
+            public void onCheckedChanged(CompoundButton toggleButton, boolean isChecked) {
+                if(isChecked){
+                    Toast.makeText(getApplicationContext(), "Control: Simulation", Toast.LENGTH_SHORT).show();
+                    toggleAllControl.setChecked(false);
+                    toggleSimulatorControl.setChecked(true);
+                    toggleP3DX1Control.setChecked(false);
+                    toggleP3DX2Control.setChecked(false);
+                    p3dxNumberTopic.setPublisher_int(0);
+                    p3dxNumberTopic.publishNow();
+                }
+            }
+        });
+
+        toggleP3DX1Control.setOnCheckedChangeListener( new CompoundButton.OnCheckedChangeListener() {
+            @Override
+            public void onCheckedChanged(CompoundButton toggleButton, boolean isChecked) {
+                if(isChecked){
+                    Toast.makeText(getApplicationContext(), "Control: P3DX1", Toast.LENGTH_SHORT).show();
+                    toggleAllControl.setChecked(false);
+                    toggleSimulatorControl.setChecked(false);
+                    toggleP3DX1Control.setChecked(true);
+                    toggleP3DX2Control.setChecked(false);
+                    p3dxNumberTopic.setPublisher_int(1);
+                    p3dxNumberTopic.publishNow();
+                }
+            }
+        });
+
+        toggleP3DX2Control.setOnCheckedChangeListener( new CompoundButton.OnCheckedChangeListener() {
+            @Override
+            public void onCheckedChanged(CompoundButton toggleButton, boolean isChecked) {
+                if(isChecked){
+                    Toast.makeText(getApplicationContext(), "Control: P3DX2", Toast.LENGTH_SHORT).show();
+                    toggleAllControl.setChecked(false);
+                    toggleSimulatorControl.setChecked(false);
+                    toggleP3DX1Control.setChecked(false);
+                    toggleP3DX2Control.setChecked(true);
+                    p3dxNumberTopic.setPublisher_int(2);
+                    p3dxNumberTopic.publishNow();
                 }
             }
         });
@@ -187,21 +334,42 @@ public class ScreenJoystickInterface extends RosActivity {
 
     private void updateVelocity(){
         float steer=joystickPositionNodeMain.getAxisY();
-        float acceleration=joystickRotationNodeMain.getAxisX()/2;
+        float acceleration=joystickPositionNodeMain.getAxisX()/2;
+
+        float cameraControlHorizontal=joystickRotationNodeMain.getAxisY();
+        float cameraControlVertical=joystickRotationNodeMain.getAxisX();
 
         if(Math.abs(steer) < 0.1f)
             steer=0.f;
         if(Math.abs(acceleration) < 0.1f)
             acceleration=0.f;
+
+        int ptz = -1;
+        if(cameraControlHorizontal < -0.5f)
+            ptz=3;
+        else if(cameraControlHorizontal > 0.5f)
+            ptz=4;
+
+        if(cameraControlVertical < -0.5f)
+            ptz=2;
+        else if(cameraControlVertical > 0.5f)
+            ptz=1;
+
         velocityTopic.setPublisher_linear(new float[]{acceleration, 0, 0});
         velocityTopic.setPublisher_angular(new float[]{0, 0, steer});
         velocityTopic.publishNow();
+
+        if(cameraNumberTopic.getPublisher_int()==2 && ptz!=-1){
+            cameraPTZTopic.setPublisher_int(ptz);
+            cameraPTZTopic.publishNow();
+        }
     }
 
     @Override
     protected void init(NodeMainExecutor nodeMainExecutor) {
         nodeMain=(NodeMainExecutorService)nodeMainExecutor;
         NodeConfiguration nodeConfiguration = NodeConfiguration.newPublic(InetAddressFactory.newNonLoopback().getHostAddress(), getMasterUri());
+        //NodeConfiguration nodeConfiguration = NodeConfiguration.newPublic("85.6.28.10", getMasterUri());
         nodeMainExecutor.execute(androidNode, nodeConfiguration.setNodeName(androidNode.getName()));
     }
 }

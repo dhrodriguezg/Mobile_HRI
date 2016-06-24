@@ -56,6 +56,15 @@
     <!-- SCREENJOYSTICK TEXT -->
     <string name="open_hand">Open H.</string>
     <string name="close_hand">Close H.</string>
+    <string name="camera1_name">Simulator</string>
+    <string name="camera2_name">Top-Down</string>
+    <string name="camera3_name">First P.</string>
+    <string name="camera4_name">Web Cam</string>
+    <string name="total_control">Steer/Throttle</string>
+    <string name="all_control">ALL</string>
+    <string name="sim_control">MSim</string>
+    <string name="p3dx1_control">P3DX1</string>
+    <string name="p3dx2_control">P3DX2</string>
 
     <!-- GAMEPAD TEXT -->
     <string name="position_control">Steer</string>
