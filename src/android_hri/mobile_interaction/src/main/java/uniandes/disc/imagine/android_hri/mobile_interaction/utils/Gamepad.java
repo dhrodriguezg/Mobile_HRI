@@ -144,6 +144,18 @@ public class Gamepad { //well...not really a listener.
     }
 
     public int getButtonValue(int button){
+        if(button==KeyEvent.KEYCODE_BUTTON_A)
+            button=KeyEvent.KEYCODE_BUTTON_1;
+        else if(button==KeyEvent.KEYCODE_BUTTON_B)
+            button=KeyEvent.KEYCODE_BUTTON_2;
+        else if(button==KeyEvent.KEYCODE_BUTTON_X)
+            button=KeyEvent.KEYCODE_BUTTON_3;
+        else if(button==KeyEvent.KEYCODE_BUTTON_Y)
+            button=KeyEvent.KEYCODE_BUTTON_4;
+        else if(button==KeyEvent.KEYCODE_BUTTON_L1)
+            button=KeyEvent.KEYCODE_BUTTON_5;
+        else if(button==KeyEvent.KEYCODE_BUTTON_R1)
+            button=KeyEvent.KEYCODE_BUTTON_6;
         return mButton.get(button);
     }
 }

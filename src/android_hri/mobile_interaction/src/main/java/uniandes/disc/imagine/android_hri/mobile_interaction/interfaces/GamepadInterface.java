@@ -47,10 +47,18 @@ public class GamepadInterface extends RosActivity {
     private AndroidNode androidNode;
     private BooleanTopic emergencyTopic;
     private Int32Topic interfaceNumberTopic;
+    private Int32Topic cameraNumberTopic;
+    private Int32Topic cameraPTZTopic;
+    private Int32Topic p3dxNumberTopic;
     private TwistTopic velocityTopic;
 
     private Gamepad gamepad;
     private boolean running=true;
+    private boolean changingCamera=false;
+    private boolean changingP3DX=false;
+
+    private int currentCamera = 0;
+    private int currentP3DX = -1;
 
     public GamepadInterface() {
         super(TAG, TAG, URI.create(MainActivity.ROS_MASTER));;
@@ -71,11 +79,27 @@ public class GamepadInterface extends RosActivity {
 
         velocityTopic = new TwistTopic();
         velocityTopic.publishTo(getString(R.string.topic_rosariavel), false, 10);
+        velocityTopic.setPublishingFreq(100);
 
         interfaceNumberTopic = new Int32Topic();
         interfaceNumberTopic.publishTo(getString(R.string.topic_interfacenumber), true, 0);
         interfaceNumberTopic.setPublishingFreq(100);
         interfaceNumberTopic.setPublisher_int(4);
+
+        cameraNumberTopic = new Int32Topic();
+        cameraNumberTopic.publishTo(getString(R.string.topic_camera_number), false, 10);
+        cameraNumberTopic.setPublishingFreq(10);
+        cameraNumberTopic.setPublisher_int(currentCamera);
+
+        cameraPTZTopic = new Int32Topic();
+        cameraPTZTopic.publishTo(getString(R.string.topic_camera_ptz), false, 10);
+        cameraPTZTopic.setPublishingFreq(10);
+        cameraPTZTopic.setPublisher_int(-1);
+
+        p3dxNumberTopic = new Int32Topic();
+        p3dxNumberTopic.publishTo(getString(R.string.topic_p3dx_number), false, 10);
+        p3dxNumberTopic.setPublishingFreq(10);
+        p3dxNumberTopic.setPublisher_int(currentP3DX);
 
         emergencyTopic = new BooleanTopic();
         emergencyTopic.publishTo(getString(R.string.topic_emergencystop), true, 0);
@@ -83,7 +107,7 @@ public class GamepadInterface extends RosActivity {
         emergencyTopic.setPublisher_bool(true);
 
         androidNode = new AndroidNode(NODE_NAME);
-        androidNode.addTopics(emergencyTopic, velocityTopic, interfaceNumberTopic);
+        androidNode.addTopics(emergencyTopic, velocityTopic, interfaceNumberTopic, cameraNumberTopic, cameraPTZTopic, p3dxNumberTopic);
         androidNode.addNodeMain(imageStreamNodeMain);
 
         gamepad = new Gamepad(this);
@@ -91,6 +115,8 @@ public class GamepadInterface extends RosActivity {
         imageStreamNodeMain.setTopicName(getString(R.string.topic_streaming));
         imageStreamNodeMain.setMessageType(getString(R.string.topic_streaming_msg));
         imageStreamNodeMain.setMessageToBitmapCallable(new BitmapFromCompressedImage());
+
+
         imageStreamNodeMain.setScaleType(ImageView.ScaleType.FIT_CENTER);
         imageStreamNodeMain.getViewTreeObserver().addOnGlobalLayoutListener(new ViewTreeObserver.OnGlobalLayoutListener() {
             @Override
@@ -191,18 +217,108 @@ public class GamepadInterface extends RosActivity {
         if(!gamepad.isAttached())
             return;
         float steer=-gamepad.getAxisValue(MotionEvent.AXIS_X);
-        //float rotY=-gamepad.getAxisValue(MotionEvent.AXIS_Y);
-        //float rotX=-gamepad.getAxisValue(MotionEvent.AXIS_Z);
-        float acceleration=-gamepad.getAxisValue(MotionEvent.AXIS_RZ);
+        float cameraControlHorizontal= gamepad.getAxisValue(MotionEvent.AXIS_Z);
+        float cameraControlVertical=-gamepad.getAxisValue(MotionEvent.AXIS_RZ);
+        float acceleration=( gamepad.getAxisValue(MotionEvent.AXIS_RTRIGGER) - gamepad.getAxisValue(MotionEvent.AXIS_LTRIGGER) )/2f;
 
         if(Math.abs(steer) < 0.1f)
             steer=0.f;
         if(Math.abs(acceleration) < 0.1f)
             acceleration=0.f;
+
+        int ptz = -1;
+        if(cameraControlHorizontal < -0.5f)
+            ptz=3;
+        else if(cameraControlHorizontal > 0.5f)
+            ptz=4;
+
+        if(cameraControlVertical < -0.5f)
+            ptz=2;
+        else if(cameraControlVertical > 0.5f)
+            ptz=1;
+
         velocityTopic.setPublisher_linear(new float[]{acceleration, 0, 0});
         velocityTopic.setPublisher_angular(new float[]{0, 0, steer});
         velocityTopic.publishNow();
+
+        if(currentCamera==2 && ptz!=-1){
+            cameraPTZTopic.setPublisher_int(ptz);
+            cameraPTZTopic.publishNow();
+        }
+
+
+        if( gamepad.getButtonValue(KeyEvent.KEYCODE_BUTTON_A) == 1)
+            changeCamera();
+        if( gamepad.getButtonValue(KeyEvent.KEYCODE_BUTTON_Y) == 1)
+            changeP3DX();
     }
+
+    private void changeCamera(){
+        if (changingCamera)
+            return;
+
+        Thread threadCamera = new Thread(){
+            public void run(){
+                changingCamera=true;
+                currentCamera++;
+                if(currentCamera>3)
+                    currentCamera=0;
+                cameraNumberTopic.setPublisher_int(currentCamera);
+                cameraNumberTopic.publishNow();
+
+                String msg = "Switching to Camera: ";
+                if(currentCamera==0)
+                    msg+= "SIMULATION";
+                else if(currentCamera==1)
+                    msg+= "TOP-DOWN";
+                else if(currentCamera==2)
+                    msg+= "FIRST PERSON";
+                else if(currentCamera==3)
+                    msg+= "WEB CAM";
+                showToast(msg);
+
+                try {
+                    Thread.sleep(500);
+                } catch (InterruptedException e) {
+                    e.getStackTrace();
+                }
+                changingCamera=false;
+            }
+        };
+        threadCamera.start();
+    }
+
+    private void changeP3DX(){
+        if (changingP3DX)
+            return;
+        Thread threadCamera = new Thread(){
+            public void run(){
+                changingP3DX=true;
+                currentP3DX++;
+                if(currentP3DX>2)
+                    currentP3DX=-1;
+                p3dxNumberTopic.setPublisher_int(currentP3DX);
+                p3dxNumberTopic.publishNow();
+                try {
+                    Thread.sleep(500);
+                } catch (InterruptedException e) {
+                    e.getStackTrace();
+                }
+                changingP3DX=false;
+            }
+        };
+        threadCamera.start();
+    }
+
+    public void showToast(final String msg) {
+
+        runOnUiThread(new Runnable() {
+            public void run() {
+                Toast.makeText(getApplicationContext(), msg, Toast.LENGTH_SHORT).show();
+            }
+        });
+    }
+
 
     @Override
     protected void init(NodeMainExecutor nodeMainExecutor) {

@@ -58,10 +58,10 @@
     <string name="close_hand">Close H.</string>
 
     <!-- GAMEPAD TEXT -->
-    <string name="position_control">2D Position</string>
-    <string name="rotation_control">1D Rotation</string>
-    <string name="grasping_open">Open Grasping</string>
-    <string name="grasping_close">Close Grasping</string>
+    <string name="position_control">Steer</string>
+    <string name="rotation_control">Camera PTZ</string>
+    <string name="grasping_open">Throttle</string>
+    <string name="grasping_close">Reverse</string>
     <string name="gamepad_on_msg">Gamepad FOUND!</string>
     <string name="gamepad_off_msg">Gamepad NOT found! Leaving activity...</string>
 
@@ -109,12 +109,16 @@
     <string name="workspace_yoffset">0.8652</string>
     <string name="workspace_height">0.5567</string>
 
-    <string name="topic_streaming">"/usb_cam/image_raw/compressed"</string>
+    <string name="topic_streaming">"/android/image_raw/compressed"</string>
     <string name="topic_streaming_msg">sensor_msgs/CompressedImage</string>
     <string name="topic_emergencystop">/android/emergency_stop</string>
     <string name="topic_interfacenumber">/android/interface_number</string>
 
-    <string name="topic_rosariavel">/RosAria/cmd_vel</string>
+    <string name="topic_camera_number">/stream/selection</string>
+    <string name="topic_camera_ptz">/first_person/camera_ptz</string>
+    <string name="topic_p3dx_number">/rosaria/selection</string>
+
+    <string name="topic_rosariavel">/rosaria/cmd_vel</string>
     <string name="topic_positionrel">/android/position_rel</string>
     <string name="topic_positionabs">/android/position_abs</string>
     <string name="topic_rotationrel">/android/rotation_rel</string>

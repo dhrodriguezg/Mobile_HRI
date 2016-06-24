@@ -18,7 +18,8 @@
         android:id="@+id/targetView"
         android:layout_centerVertical="true"
         android:layout_alignParentRight="true"
-        android:layout_marginRight="120dp"/>
+        android:layout_marginRight="120dp"
+        android:visibility="invisible" />
 
     <ImageView
         android:id="@+id/virtual_joystick_pos"
@@ -83,7 +84,8 @@
         android:textColor="#ff3f3f3f"
         android:layout_gravity="center_vertical"
         android:layout_below="@+id/virtual_trigger_close"
-        android:layout_alignParentLeft="true" />
+        android:layout_alignParentLeft="true"
+        android:layout_alignRight="@+id/virtual_trigger_close" />
 
     <ImageView
         android:id="@+id/virtual_trigger_open"
@@ -104,7 +106,8 @@
         android:textColor="#ff3f3f3f"
         android:layout_gravity="center_vertical"
         android:layout_below="@+id/virtual_trigger_open"
-        android:layout_alignParentRight="true" />
+        android:layout_alignParentRight="true"
+        android:layout_alignLeft="@+id/virtual_trigger_open" />
 
     <ToggleButton
         android:layout_width="wrap_content"
@@ -125,6 +128,7 @@
         android:id="@+id/targetCenter"
         android:layout_centerVertical="true"
         android:layout_centerHorizontal="true"
-        android:alpha="0.7"/>
+        android:alpha="0.7"
+        android:visibility="invisible" />
 
 </RelativeLayout>

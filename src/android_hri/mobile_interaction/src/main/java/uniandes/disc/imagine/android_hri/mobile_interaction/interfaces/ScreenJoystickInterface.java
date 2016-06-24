@@ -187,7 +187,7 @@ public class ScreenJoystickInterface extends RosActivity {
 
     private void updateVelocity(){
         float steer=joystickPositionNodeMain.getAxisY();
-        float acceleration=joystickRotationNodeMain.getAxisX();
+        float acceleration=joystickRotationNodeMain.getAxisX()/2;
 
         if(Math.abs(steer) < 0.1f)
             steer=0.f;

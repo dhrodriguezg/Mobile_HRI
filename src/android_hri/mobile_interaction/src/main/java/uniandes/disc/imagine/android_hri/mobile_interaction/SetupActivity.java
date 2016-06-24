@@ -113,8 +113,10 @@ public class SetupActivity extends RosActivity {
         statusGrasp_OFF = (TextView) findViewById(R.id.statusGrasp_OFF);
 
         imageStreamNodeMain = (RosImageView<CompressedImage>) findViewById(R.id.streamingView);
-        imageStreamNodeMain.setTopicName(getString(R.string.topic_streaming));
-        imageStreamNodeMain.setMessageType(getString(R.string.topic_streaming_msg));
+        //imageStreamNodeMain.setTopicName(getString(R.string.topic_streaming));
+        //imageStreamNodeMain.setMessageType(getString(R.string.topic_streaming_msg));
+        imageStreamNodeMain.setTopicName("/usb_cam/image_raw/theora");
+        imageStreamNodeMain.setMessageType("sensor_msgs/CompressedImage");
         imageStreamNodeMain.getViewTreeObserver().addOnGlobalLayoutListener(new ViewTreeObserver.OnGlobalLayoutListener() {
             @Override
             public void onGlobalLayout() {
