@@ -12,9 +12,12 @@ import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.Toast;
 
+import org.ros.address.InetAddressFactory;
+
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.net.NetworkInterface;
 import java.text.DecimalFormat;
 import java.util.Locale;
 
@@ -27,6 +30,7 @@ public class MainActivity extends ActionBarActivity {
 
     private static final String TAG = "MainActivity";
     public static String ROS_MASTER = "";
+    public static String ROS_HOST = "";
 
     public static float WORKSPACE_X_OFFSET = 0.2306f;
     public static float WORKSPACE_WIDTH = 0.4889f;
@@ -230,6 +234,13 @@ public class MainActivity extends ActionBarActivity {
     }
 
     private boolean isMasterValid(){
+        try {
+            ROS_HOST = NetworkInterface.getByName("ppp0").getInterfaceAddresses().get(0).getAddress().getHostAddress();
+        } catch (Exception e) {
+        }
+        if(ROS_HOST.equals(""))
+            ROS_HOST = InetAddressFactory.newNonLoopback().getHostAddress();
+
         ROS_MASTER = "http://" + rosIP.getText().toString() + ":" + rosPort.getText().toString();
         int exit = pingHost(rosIP.getText().toString(), 1, false);
         if (exit!=0){

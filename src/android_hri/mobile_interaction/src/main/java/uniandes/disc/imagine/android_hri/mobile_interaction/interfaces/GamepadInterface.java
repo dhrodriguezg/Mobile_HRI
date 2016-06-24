@@ -323,7 +323,7 @@ public class GamepadInterface extends RosActivity {
     @Override
     protected void init(NodeMainExecutor nodeMainExecutor) {
         nodeMain=(NodeMainExecutorService)nodeMainExecutor;
-        NodeConfiguration nodeConfiguration = NodeConfiguration.newPublic(InetAddressFactory.newNonLoopback().getHostAddress(), getMasterUri());
+        NodeConfiguration nodeConfiguration = NodeConfiguration.newPublic(MainActivity.ROS_HOST, getMasterUri());
         nodeMainExecutor.execute(androidNode, nodeConfiguration.setNodeName(androidNode.getName()));
     }
 }

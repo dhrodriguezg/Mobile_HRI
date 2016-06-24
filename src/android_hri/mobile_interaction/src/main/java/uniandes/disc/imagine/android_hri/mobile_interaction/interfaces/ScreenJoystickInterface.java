@@ -2,7 +2,6 @@ package uniandes.disc.imagine.android_hri.mobile_interaction.interfaces;
 
 import android.content.Intent;
 import android.graphics.Color;
-import android.graphics.Matrix;
 import android.os.Bundle;
 import android.util.TypedValue;
 import android.view.ViewTreeObserver;
@@ -13,7 +12,6 @@ import android.widget.RelativeLayout;
 import android.widget.Toast;
 import android.widget.ToggleButton;
 
-import org.ros.address.InetAddressFactory;
 import org.ros.android.BitmapFromCompressedImage;
 import org.ros.android.NodeMainExecutorService;
 import org.ros.android.RosActivity;
@@ -27,13 +25,10 @@ import sensor_msgs.CompressedImage;
 import uniandes.disc.imagine.android_hri.mobile_interaction.MainActivity;
 import uniandes.disc.imagine.android_hri.mobile_interaction.R;
 import uniandes.disc.imagine.android_hri.mobile_interaction.topic.BooleanTopic;
-import uniandes.disc.imagine.android_hri.mobile_interaction.topic.Float32Topic;
 import uniandes.disc.imagine.android_hri.mobile_interaction.topic.Int32Topic;
-import uniandes.disc.imagine.android_hri.mobile_interaction.topic.PointTopic;
 import uniandes.disc.imagine.android_hri.mobile_interaction.topic.TwistTopic;
 import uniandes.disc.imagine.android_hri.mobile_interaction.utils.AndroidNode;
 import uniandes.disc.imagine.android_hri.mobile_interaction.widget.CustomVirtualJoystickView;
-import uniandes.disc.imagine.android_hri.mobile_interaction.widget.ScrollerView;
 
 public class ScreenJoystickInterface extends RosActivity {
 
@@ -368,8 +363,7 @@ public class ScreenJoystickInterface extends RosActivity {
     @Override
     protected void init(NodeMainExecutor nodeMainExecutor) {
         nodeMain=(NodeMainExecutorService)nodeMainExecutor;
-        NodeConfiguration nodeConfiguration = NodeConfiguration.newPublic(InetAddressFactory.newNonLoopback().getHostAddress(), getMasterUri());
-        //NodeConfiguration nodeConfiguration = NodeConfiguration.newPublic("85.6.28.10", getMasterUri());
+        NodeConfiguration nodeConfiguration = NodeConfiguration.newPublic(MainActivity.ROS_HOST, getMasterUri());
         nodeMainExecutor.execute(androidNode, nodeConfiguration.setNodeName(androidNode.getName()));
     }
 }
