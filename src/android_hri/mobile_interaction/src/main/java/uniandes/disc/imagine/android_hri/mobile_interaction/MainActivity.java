@@ -4,12 +4,14 @@ import android.content.Intent;
 import android.content.res.Configuration;
 import android.os.Bundle;
 import android.support.v7.app.ActionBarActivity;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageView;
+import android.widget.PopupMenu;
 import android.widget.Toast;
 
 import org.ros.address.InetAddressFactory;
@@ -17,16 +19,22 @@ import org.ros.address.InetAddressFactory;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.net.InetAddress;
+import java.net.InetSocketAddress;
 import java.net.NetworkInterface;
+import java.net.Socket;
+import java.net.SocketException;
 import java.text.DecimalFormat;
+import java.util.Enumeration;
 import java.util.Locale;
+import java.util.TreeMap;
 
 import uniandes.disc.imagine.android_hri.mobile_interaction.interfaces.DirectManipulationInterface;
 import uniandes.disc.imagine.android_hri.mobile_interaction.interfaces.GamepadInterface;
 import uniandes.disc.imagine.android_hri.mobile_interaction.interfaces.LeapMotionInterface;
 import uniandes.disc.imagine.android_hri.mobile_interaction.interfaces.ScreenJoystickInterface;
 
-public class MainActivity extends ActionBarActivity {
+public class MainActivity extends ActionBarActivity implements PopupMenu.OnMenuItemClickListener {
 
     private static final String TAG = "MainActivity";
     public static String ROS_MASTER = "";
@@ -39,14 +47,18 @@ public class MainActivity extends ActionBarActivity {
 
     private EditText rosIP;
     private EditText rosPort;
+    private EditText hostnameIP;
+    private TreeMap<String,String> hostNameIPs;
     private ImageView interface_1;
     private ImageView interface_2;
     private ImageView interface_3;
     private ImageView interface_4;
     private MenuItem[] language;
+    private PopupMenu deviceIps;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
+        findAllDeviceIPs();
         super.onCreate(savedInstanceState);
         loadGUI();
     }
@@ -55,6 +67,7 @@ public class MainActivity extends ActionBarActivity {
         setContentView(R.layout.activity_main);
         rosIP = (EditText) findViewById(R.id.editIP);
         rosPort = (EditText) findViewById(R.id.editPort);
+        hostnameIP = (EditText) findViewById(R.id.hostNameIP);
         interface_1 = (ImageView) findViewById(R.id.imageViewPreviewController);
         interface_2 = (ImageView) findViewById(R.id.imageViewPreviewDragging);
         interface_3 = (ImageView) findViewById(R.id.imageViewPreviewGamepad);
@@ -64,11 +77,43 @@ public class MainActivity extends ActionBarActivity {
         WORKSPACE_Y_OFFSET= Float.parseFloat(getString(R.string.workspace_yoffset));
         WORKSPACE_HEIGHT= Float.parseFloat(getString(R.string.workspace_height));
 
+        int id = 0;
+        hostnameIP.setText(ROS_HOST);
+        deviceIps = new PopupMenu( this, hostnameIP );
+        deviceIps.setOnMenuItemClickListener(this);
+        for (String interfaces : hostNameIPs.keySet()){
+            id++;
+            deviceIps.getMenu().add(2, id, id, interfaces +": " + hostNameIPs.get(interfaces));
+        }
+
         Button pingButton = (Button) findViewById(R.id.pingButton);
         pingButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 startSendingPing();
+            }
+        });
+
+        Button testButton = (Button) findViewById(R.id.testButton);
+        testButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                testMaster(rosIP.getText().toString(), Integer.parseInt(rosPort.getText().toString()));
+            }
+        });
+
+        Button changeButton = (Button) findViewById(R.id.changeIP);
+        changeButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                deviceIps.getMenu().clear();
+                findAllDeviceIPs();
+                int id=0;
+                for (String interfaces : hostNameIPs.keySet()){
+                    id++;
+                    deviceIps.getMenu().add(2, id, id, interfaces +": " + hostNameIPs.get(interfaces));
+                }
+                deviceIps.show();
             }
         });
 
@@ -88,13 +133,6 @@ public class MainActivity extends ActionBarActivity {
             }
         });
 
-        Button controllerButton = (Button) findViewById(R.id.controllerButton);
-        controllerButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                startControllerActivity();
-            }
-        });
         interface_1.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -102,13 +140,6 @@ public class MainActivity extends ActionBarActivity {
             }
         });
 
-        Button draggingButton = (Button) findViewById(R.id.draggingButton);
-        draggingButton.setOnClickListener( new View.OnClickListener() {
-            @Override
-            public void onClick( View v ) {
-                startDraggingActivity();
-            }
-        });
         interface_2.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -116,13 +147,6 @@ public class MainActivity extends ActionBarActivity {
             }
         });
 
-        Button gamepadButton = (Button) findViewById(R.id.gamepadButton);
-        gamepadButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                startGamepadActivity();
-            }
-        });
         interface_3.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -130,13 +154,6 @@ public class MainActivity extends ActionBarActivity {
             }
         });
 
-        Button leapButton = (Button) findViewById(R.id.leapMotionButton);
-        leapButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                startLeapMotionActivity();
-            }
-        });
         interface_4.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -148,9 +165,10 @@ public class MainActivity extends ActionBarActivity {
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         // Inflate the menu; this adds items to the action bar if it is present.
-        language = new MenuItem[2]; //for now...
-        language[0]= menu.add(1,1, Menu.NONE,getString(R.string.english));
-        language[1]= menu.add(1,2, Menu.NONE,getString(R.string.spanish));
+        language = new MenuItem[3]; //for now...
+        language[0]= menu.add(1, 1, Menu.NONE, getString(R.string.english));
+        language[1]= menu.add(1, 2, Menu.NONE, getString(R.string.spanish));
+
         return true;
     }
 
@@ -182,6 +200,18 @@ public class MainActivity extends ActionBarActivity {
         }
 
         return super.onOptionsItemSelected(item);
+    }
+
+    @Override
+    public boolean onMenuItemClick(MenuItem menuItem) {
+        switch (menuItem.getGroupId()) {
+            case 2:
+                ROS_HOST = hostNameIPs.get(menuItem.getTitle().toString().split(":")[0]);
+                hostnameIP.setText(ROS_HOST);
+                return true;
+            default:
+                return false;
+        }
     }
 
     private void startSendingPing(){
@@ -233,14 +263,43 @@ public class MainActivity extends ActionBarActivity {
         }
     }
 
+    private void findAllDeviceIPs(){
+        hostNameIPs = new TreeMap<String,String>();
+        try {
+            Enumeration<NetworkInterface> networkInterfaces = NetworkInterface.getNetworkInterfaces();
+            while (networkInterfaces.hasMoreElements()){
+                NetworkInterface networkInterface = networkInterfaces.nextElement();
+                Enumeration<InetAddress> inetAddresses = networkInterface.getInetAddresses();
+
+                while (inetAddresses.hasMoreElements()){
+                    InetAddress inetAddress = inetAddresses.nextElement();
+                    if ( !inetAddress.getHostAddress().contains("%") || !inetAddress.getHostAddress().contains(":")) {
+                        hostNameIPs.put(networkInterface.getName(), inetAddress.getHostAddress());
+                        Log.i("Network ",networkInterface.getName() +" : " + inetAddress.getHostAddress());
+                        if(networkInterface.getName().startsWith("ppp"))
+                            ROS_HOST=inetAddress.getHostAddress();
+                    }
+                }
+            }
+        } catch (SocketException e) {
+            e.printStackTrace();
+        }
+        if(ROS_HOST.equals(""))
+            ROS_HOST = InetAddressFactory.newNonLoopback().getHostAddress();
+
+    }
+
     private boolean isMasterValid(){
         try {
             ROS_HOST = NetworkInterface.getByName("ppp0").getInterfaceAddresses().get(0).getAddress().getHostAddress();
+            Log.i("VPN", ROS_HOST);
+            ////"fe80::f2be:d743:4e03:2c8e" _
         } catch (Exception e) {
         }
         if(ROS_HOST.equals(""))
             ROS_HOST = InetAddressFactory.newNonLoopback().getHostAddress();
 
+        ROS_HOST = InetAddressFactory.newNonLoopback().getHostAddress();
         ROS_MASTER = "http://" + rosIP.getText().toString() + ":" + rosPort.getText().toString();
         int exit = pingHost(rosIP.getText().toString(), 1, false);
         if (exit!=0){
@@ -250,11 +309,41 @@ public class MainActivity extends ActionBarActivity {
         return true;
     }
 
+    private void testMaster(final String host, final int port){
+
+        Thread thread = new Thread(){
+            public void run(){
+                int state=-1;
+                try {
+                    Socket socket = new Socket();
+                    socket.connect(new InetSocketAddress(host, port), 1000);
+                    if(socket.isConnected()){
+                        state=0;
+                    }
+                    socket.close();
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+                final int status = state;
+
+                runOnUiThread(new Runnable() {
+                    public void run() {
+                        if(status==0)
+                            Toast.makeText(getApplicationContext(), "Connection successful", Toast.LENGTH_LONG).show();
+                        else
+                            Toast.makeText(getApplicationContext(), "Can't connect to "+host+":"+port+". Is roscore running?", Toast.LENGTH_LONG).show();
+                    }
+                });
+            }
+        };
+        thread.start();
+    }
+
     private int pingHost(String host, int tries, boolean showStats){
         int exit = -1;
         try {
             Runtime runtime = Runtime.getRuntime();
-            Process proc = runtime.exec("ping -c " + tries + " " + host);
+            Process proc = runtime.exec("ping -c " + tries + " " + host); // telnet ip 80
             proc.waitFor();
             if(showStats){
                 BufferedReader stdInput = new BufferedReader(new InputStreamReader(proc.getInputStream()));

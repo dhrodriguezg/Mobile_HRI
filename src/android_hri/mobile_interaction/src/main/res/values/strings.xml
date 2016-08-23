@@ -12,13 +12,22 @@
 
     <!-- MAIN TEXT -->
     <string name="app_name">Mobile Android Interface</string>
+    <string name="network_setting">Network Settings</string>
     <string name="ros_master_ip">ROS Master Address:</string>
     <string name="ros_master_port">ROS Master Port:</string>
     <string name="default_master_ip">85.6.28.1</string>
     <string name="default_master_port">11311</string>
     <string name="ping">Ping</string>
+    <string name="test">Test</string>
+
+    <string name="ros_hostname_ip">ROS Hostname Address:</string>
+    <string name="default_hostname_ip">0.0.0.0</string>
+    <string name="change_hostname_ip">Change</string>
+
+    <string name="options">Options</string>
     <string name="setup">Setup</string>
     <string name="camera">Camera</string>
+    <string name="interfaces">Interfaces</string>
     <string name="interface_screenjoystick_name">Screen Joysticks</string>
     <string name="interface_screenjoystick_number">Interface 1</string>
     <string name="interface_directmanipulation_name">Direct Manipulation</string>

@@ -217,9 +217,11 @@ public class GamepadInterface extends RosActivity {
         if(!gamepad.isAttached())
             return;
         float steer=-gamepad.getAxisValue(MotionEvent.AXIS_X);
+        float acceleration=-gamepad.getAxisValue(MotionEvent.AXIS_Y)/2f;
+
         float cameraControlHorizontal= gamepad.getAxisValue(MotionEvent.AXIS_Z);
         float cameraControlVertical=-gamepad.getAxisValue(MotionEvent.AXIS_RZ);
-        float acceleration=( gamepad.getAxisValue(MotionEvent.AXIS_RTRIGGER) - gamepad.getAxisValue(MotionEvent.AXIS_LTRIGGER) )/2f;
+        //float acceleration=( gamepad.getAxisValue(MotionEvent.AXIS_RTRIGGER) - gamepad.getAxisValue(MotionEvent.AXIS_LTRIGGER) )/2f;
 
         if(Math.abs(steer) < 0.1f)
             steer=0.f;
@@ -244,8 +246,8 @@ public class GamepadInterface extends RosActivity {
         if(currentCamera==2 && ptz!=-1){
             cameraPTZTopic.setPublisher_int(ptz);
             cameraPTZTopic.publishNow();
-        }
 
+        }
 
         if( gamepad.getButtonValue(KeyEvent.KEYCODE_BUTTON_A) == 1)
             changeCamera();
@@ -266,15 +268,15 @@ public class GamepadInterface extends RosActivity {
                 cameraNumberTopic.setPublisher_int(currentCamera);
                 cameraNumberTopic.publishNow();
 
-                String msg = "Switching to Camera: ";
+                String msg = "Camera: ";
                 if(currentCamera==0)
-                    msg+= "SIMULATION";
+                    msg+= "Simulation";
                 else if(currentCamera==1)
-                    msg+= "TOP-DOWN";
+                    msg+= "Top-Down";
                 else if(currentCamera==2)
-                    msg+= "FIRST PERSON";
+                    msg+= "First Person";
                 else if(currentCamera==3)
-                    msg+= "WEB CAM";
+                    msg+= "Web Cam";
                 showToast(msg);
 
                 try {
@@ -299,6 +301,18 @@ public class GamepadInterface extends RosActivity {
                     currentP3DX=-1;
                 p3dxNumberTopic.setPublisher_int(currentP3DX);
                 p3dxNumberTopic.publishNow();
+
+                String msg = "Control: ";
+                if(currentP3DX==0)
+                    msg+= "Simulation";
+                else if(currentP3DX==1)
+                    msg+= "P3DX1";
+                else if(currentP3DX==2)
+                    msg+= "P3DX2";
+                else if(currentP3DX==-1)
+                    msg+= "ALL";
+                showToast(msg);
+
                 try {
                     Thread.sleep(500);
                 } catch (InterruptedException e) {

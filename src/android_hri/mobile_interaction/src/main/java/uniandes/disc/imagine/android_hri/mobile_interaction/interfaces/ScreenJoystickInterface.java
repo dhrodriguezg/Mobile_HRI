@@ -341,9 +341,9 @@ public class ScreenJoystickInterface extends RosActivity {
 
         int ptz = -1;
         if(cameraControlHorizontal < -0.5f)
-            ptz=3;
-        else if(cameraControlHorizontal > 0.5f)
             ptz=4;
+        else if(cameraControlHorizontal > 0.5f)
+            ptz=3;
 
         if(cameraControlVertical < -0.5f)
             ptz=2;
