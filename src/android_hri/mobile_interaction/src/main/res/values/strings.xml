@@ -19,22 +19,20 @@
     <string name="default_master_port">11311</string>
     <string name="ping">Ping</string>
     <string name="test">Test</string>
-
     <string name="ros_hostname_ip">ROS Hostname Address:</string>
     <string name="default_hostname_ip">0.0.0.0</string>
     <string name="change_hostname_ip">Change</string>
-
     <string name="options">Options</string>
     <string name="setup">Setup</string>
     <string name="camera">Camera</string>
     <string name="interfaces">Interfaces</string>
-    <string name="interface_screenjoystick_name">Screen Joysticks</string>
-    <string name="interface_screenjoystick_number">Interface 1</string>
-    <string name="interface_directmanipulation_name">Direct Manipulation</string>
-    <string name="interface_directmanipulation_number">Interface 2</string>
-    <string name="interface_gamepad_name">Gamepad</string>
-    <string name="interface_gamepad_number">Interface 3</string>
-    <string name="interface_leapmotion_name">Leap Motion</string>
+    <string name="interface_gamepad_name">1. Gamepad</string>
+    <string name="interface_gamepad_number">Interface 1</string>
+    <string name="interface_screenjoystick_name">2. Screen Joysticks</string>
+    <string name="interface_screenjoystick_number">Interface 2</string>
+    <string name="interface_directmanipulation_name">3. Direct Manipulation</string>
+    <string name="interface_directmanipulation_number">Interface 3</string>
+    <string name="interface_leapmotion_name">4. Leap Motion</string>
     <string name="interface_leapmotion_number">Interface 4</string>
 
     <!-- SETUP TEXT -->

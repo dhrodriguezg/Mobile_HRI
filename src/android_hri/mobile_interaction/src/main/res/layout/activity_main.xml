@@ -109,11 +109,36 @@
 
         <TextView
             android:layout_width="0dp"
+            android:text="@string/interface_gamepad_name"
+            grid:layout_columnWeight="1"
+            grid:layout_gravity="fill_horizontal"
+            android:id="@+id/textViewGamepad"
+            android:gravity="center" />
+
+        <TextView
+            android:layout_width="0dp"
             android:text="@string/interface_screenjoystick_name"
             grid:layout_columnWeight="1"
             grid:layout_gravity="fill_horizontal"
             android:id="@+id/textViewController"
             android:gravity="center" />
+
+        <ImageView
+            android:layout_width="0dp"
+            android:layout_height="70dp"
+            android:src="@drawable/interface_gamepad"
+            grid:layout_columnWeight="1"
+            grid:layout_gravity="fill_horizontal"
+            android:id="@+id/imageViewPreviewGamepad" />
+
+        <ImageView
+            android:layout_width="0dp"
+            android:layout_height="70dp"
+            android:gravity="center"
+            android:src="@drawable/interface_screenjoystick"
+            grid:layout_columnWeight="1"
+            grid:layout_gravity="fill_horizontal"
+            android:id="@+id/imageViewPreviewController" />
 
         <TextView
             android:layout_width="0dp"
@@ -121,31 +146,6 @@
             grid:layout_columnWeight="1"
             grid:layout_gravity="fill_horizontal"
             android:id="@+id/textViewDragging"
-            android:gravity="center" />
-
-        <ImageView
-            android:layout_width="0dp"
-            android:layout_height="70dp"
-            android:gravity="center"
-            android:src="@drawable/interface_1"
-            grid:layout_columnWeight="1"
-            grid:layout_gravity="fill_horizontal"
-            android:id="@+id/imageViewPreviewController" />
-
-        <ImageView
-            android:layout_width="0dp"
-            android:layout_height="70dp"
-            android:src="@drawable/interface_2"
-            grid:layout_columnWeight="1"
-            grid:layout_gravity="fill_horizontal"
-            android:id="@+id/imageViewPreviewDragging" />
-
-        <TextView
-            android:layout_width="0dp"
-            android:text="@string/interface_gamepad_name"
-            grid:layout_columnWeight="1"
-            grid:layout_gravity="fill_horizontal"
-            android:id="@+id/textViewGamepad"
             android:gravity="center" />
 
         <TextView
@@ -159,15 +159,15 @@
         <ImageView
             android:layout_width="0dp"
             android:layout_height="70dp"
-            android:src="@drawable/interface_3"
+            android:src="@drawable/interface_directmanipulation"
             grid:layout_columnWeight="1"
             grid:layout_gravity="fill_horizontal"
-            android:id="@+id/imageViewPreviewGamepad" />
+            android:id="@+id/imageViewPreviewDragging" />
 
         <ImageView
             android:layout_width="0dp"
             android:layout_height="70dp"
-            android:src="@drawable/interface_4"
+            android:src="@drawable/interface_leapmotion"
             grid:layout_columnWeight="1"
             grid:layout_gravity="fill_horizontal"
             android:id="@+id/imageViewPreviewLeapMotion" />
