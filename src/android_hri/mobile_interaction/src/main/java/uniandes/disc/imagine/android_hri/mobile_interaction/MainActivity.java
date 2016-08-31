@@ -47,7 +47,7 @@ public class MainActivity extends ActionBarActivity implements PopupMenu.OnMenuI
 
     private EditText rosIP;
     private EditText rosPort;
-    private EditText hostnameIP;
+    private EditText hostIP;
     private TreeMap<String,String> hostNameIPs;
     private ImageView interface_1;
     private ImageView interface_2;
@@ -67,7 +67,7 @@ public class MainActivity extends ActionBarActivity implements PopupMenu.OnMenuI
         setContentView(R.layout.activity_main);
         rosIP = (EditText) findViewById(R.id.editIP);
         rosPort = (EditText) findViewById(R.id.editPort);
-        hostnameIP = (EditText) findViewById(R.id.hostNameIP);
+        hostIP = (EditText) findViewById(R.id.hostNameIP);
         interface_1 = (ImageView) findViewById(R.id.imageViewPreviewController);
         interface_2 = (ImageView) findViewById(R.id.imageViewPreviewDragging);
         interface_3 = (ImageView) findViewById(R.id.imageViewPreviewGamepad);
@@ -77,10 +77,13 @@ public class MainActivity extends ActionBarActivity implements PopupMenu.OnMenuI
         WORKSPACE_Y_OFFSET= Float.parseFloat(getString(R.string.workspace_yoffset));
         WORKSPACE_HEIGHT= Float.parseFloat(getString(R.string.workspace_height));
 
-        int id = 0;
-        hostnameIP.setText(ROS_HOST);
-        deviceIps = new PopupMenu( this, hostnameIP );
+        if(hostNameIPs.containsKey("ppp0"))
+            hostIP.setText(hostNameIPs.get("ppp0"));
+        else
+            hostIP.setText(InetAddressFactory.newNonLoopback().getHostAddress());
+        deviceIps = new PopupMenu( this, hostIP);
         deviceIps.setOnMenuItemClickListener(this);
+        int id = 0;
         for (String interfaces : hostNameIPs.keySet()){
             id++;
             deviceIps.getMenu().add(2, id, id, interfaces +": " + hostNameIPs.get(interfaces));
@@ -206,8 +209,7 @@ public class MainActivity extends ActionBarActivity implements PopupMenu.OnMenuI
     public boolean onMenuItemClick(MenuItem menuItem) {
         switch (menuItem.getGroupId()) {
             case 2:
-                ROS_HOST = hostNameIPs.get(menuItem.getTitle().toString().split(":")[0]);
-                hostnameIP.setText(ROS_HOST);
+                hostIP.setText(hostNameIPs.get(menuItem.getTitle().toString().split(":")[0]));
                 return true;
             default:
                 return false;
@@ -276,30 +278,17 @@ public class MainActivity extends ActionBarActivity implements PopupMenu.OnMenuI
                     if ( !inetAddress.getHostAddress().contains("%") || !inetAddress.getHostAddress().contains(":")) {
                         hostNameIPs.put(networkInterface.getName(), inetAddress.getHostAddress());
                         Log.i("Network ",networkInterface.getName() +" : " + inetAddress.getHostAddress());
-                        if(networkInterface.getName().startsWith("ppp"))
-                            ROS_HOST=inetAddress.getHostAddress();
                     }
                 }
             }
         } catch (SocketException e) {
             e.printStackTrace();
         }
-        if(ROS_HOST.equals(""))
-            ROS_HOST = InetAddressFactory.newNonLoopback().getHostAddress();
-
     }
 
     private boolean isMasterValid(){
-        try {
-            ROS_HOST = NetworkInterface.getByName("ppp0").getInterfaceAddresses().get(0).getAddress().getHostAddress();
-            Log.i("VPN", ROS_HOST);
-            ////"fe80::f2be:d743:4e03:2c8e" _
-        } catch (Exception e) {
-        }
-        if(ROS_HOST.equals(""))
-            ROS_HOST = InetAddressFactory.newNonLoopback().getHostAddress();
 
-        ROS_HOST = InetAddressFactory.newNonLoopback().getHostAddress();
+        ROS_HOST = hostIP.getText().toString();
         ROS_MASTER = "http://" + rosIP.getText().toString() + ":" + rosPort.getText().toString();
         int exit = pingHost(rosIP.getText().toString(), 1, false);
         if (exit!=0){
