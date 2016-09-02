@@ -21,7 +21,6 @@ import android.widget.TextView;
 import android.widget.Toast;
 import android.widget.ToggleButton;
 
-import org.ros.address.InetAddressFactory;
 import org.ros.android.BitmapFromCompressedImage;
 import org.ros.android.NodeMainExecutorService;
 import org.ros.android.RosActivity;
@@ -74,7 +73,7 @@ public class DirectManipulationInterface extends RosActivity implements SensorEv
     private float maxTargetSpeed;
 
     public DirectManipulationInterface() {
-        super(TAG, TAG, URI.create(MainActivity.ROS_MASTER));
+        super(TAG, TAG, URI.create(MainActivity.ROS_MASTER_URI));
     }
 
     @Override
@@ -344,7 +343,7 @@ public class DirectManipulationInterface extends RosActivity implements SensorEv
     @Override
     protected void init(NodeMainExecutor nodeMainExecutor) {
         nodeMain=(NodeMainExecutorService)nodeMainExecutor;
-        NodeConfiguration nodeConfiguration = NodeConfiguration.newPublic(MainActivity.ROS_HOST, getMasterUri());
+        NodeConfiguration nodeConfiguration = NodeConfiguration.newPublic(MainActivity.ROS_HOSTNAME, getMasterUri());
         nodeMainExecutor.execute(androidNode, nodeConfiguration.setNodeName(androidNode.getName()));
     }
 

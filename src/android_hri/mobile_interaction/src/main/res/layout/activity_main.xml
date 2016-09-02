@@ -28,58 +28,58 @@
         <TextView
             android:text="@string/ros_master_ip"
             android:id="@+id/textViewIP"
-            grid:layout_rowColumn="1"
+            grid:layout_columnWeight="1"
             grid:layout_rowWeight="1" />
 
         <EditText
             android:id="@+id/editIP"
             android:text="@string/default_master_ip"
             android:inputType="phone"
-            grid:layout_rowColumn="1"
+            grid:layout_columnWeight="1"
             grid:layout_rowWeight="1"/>
 
         <Button
             android:text="@string/ping"
             android:id="@+id/pingButton"
-            grid:layout_rowColumn="1"
+            grid:layout_columnWeight="1"
             grid:layout_rowWeight="1" />
 
         <TextView
             android:text="@string/ros_master_port"
             android:id="@+id/textViewPort"
-            grid:layout_rowColumn="1"
+            grid:layout_columnWeight="1"
             grid:layout_rowWeight="1"/>
 
         <EditText
             android:inputType="number"
             android:text="@string/default_master_port"
             android:id="@+id/editPort"
-            grid:layout_rowColumn="1"
+            grid:layout_columnWeight="1"
             grid:layout_rowWeight="1"/>
 
         <Button
             android:text="@string/test"
             android:id="@+id/testButton"
-            grid:layout_rowColumn="1"
+            grid:layout_columnWeight="1"
             grid:layout_rowWeight="1"/>
 
         <TextView
             android:text="@string/ros_hostname_ip"
             android:id="@+id/textDeviceIP"
-            grid:layout_rowColumn="1"
+            grid:layout_columnWeight="1"
             grid:layout_rowWeight="1"/>
 
         <EditText
             android:id="@+id/hostNameIP"
             android:text="@string/default_hostname_ip"
             android:inputType="phone"
-            grid:layout_rowColumn="1"
+            grid:layout_columnWeight="1"
             grid:layout_rowWeight="1"/>
 
         <Button
             android:text="@string/change_hostname_ip"
             android:id="@+id/changeIP"
-            grid:layout_rowColumn="1"
+            grid:layout_columnWeight="1"
             grid:layout_rowWeight="1"/>
 
         <TextView
@@ -93,13 +93,13 @@
         <Button
             android:text="@string/setup"
             android:id="@+id/calibrationButton"
-            grid:layout_rowColumn="1"
+            grid:layout_columnWeight="1"
             grid:layout_rowWeight="1"/>
 
         <Button
             android:text="@string/camera"
             android:id="@+id/cameraButton"
-            grid:layout_rowColumn="1"
+            grid:layout_columnWeight="1"
             grid:layout_rowWeight="1"/>
 
     </android.support.v7.widget.GridLayout>

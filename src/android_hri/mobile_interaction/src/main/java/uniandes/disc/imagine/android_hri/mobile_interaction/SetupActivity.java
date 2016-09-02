@@ -91,7 +91,7 @@ public class SetupActivity extends RosActivity {
     private int trackerNumber=0;
 
     public SetupActivity() {
-        super(TAG, TAG, URI.create(MainActivity.ROS_MASTER));
+        super(TAG, TAG, URI.create(MainActivity.ROS_MASTER_URI));
     }
 
     @Override

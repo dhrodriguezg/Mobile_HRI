@@ -28,6 +28,7 @@ import uniandes.disc.imagine.android_hri.mobile_interaction.topic.BooleanTopic;
 import uniandes.disc.imagine.android_hri.mobile_interaction.topic.Int32Topic;
 import uniandes.disc.imagine.android_hri.mobile_interaction.topic.TwistTopic;
 import uniandes.disc.imagine.android_hri.mobile_interaction.utils.AndroidNode;
+import uniandes.disc.imagine.android_hri.mobile_interaction.utils.UDPComm;
 import uniandes.disc.imagine.android_hri.mobile_interaction.widget.CustomVirtualJoystickView;
 
 public class ScreenJoystickInterface extends RosActivity {
@@ -58,12 +59,13 @@ public class ScreenJoystickInterface extends RosActivity {
     private TwistTopic velocityTopic;
 
     private ImageView targetImage;
+    private UDPComm udpComm;
 
     private boolean running=true;
     private float maxTargetSpeed;
 
     public ScreenJoystickInterface() {
-        super(TAG, TAG, URI.create(MainActivity.ROS_MASTER));;
+        super(TAG, TAG, URI.create(MainActivity.ROS_MASTER_URI));;
     }
 
     @Override
@@ -76,7 +78,7 @@ public class ScreenJoystickInterface extends RosActivity {
         getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
 
         maxTargetSpeed=TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, Float.parseFloat(getString(R.string.max_target_speed)), getResources().getDisplayMetrics());
-
+        udpComm = new UDPComm(MainActivity.ROS_MASTER, 8528);
 
         joystickPositionNodeMain = (CustomVirtualJoystickView) findViewById(R.id.virtual_joystick_pos);
         joystickRotationNodeMain = (CustomVirtualJoystickView) findViewById(R.id.virtual_joystick_rot);
@@ -115,7 +117,7 @@ public class ScreenJoystickInterface extends RosActivity {
         emergencyTopic.setPublisher_bool(true);
 
         androidNode = new AndroidNode(NODE_NAME);
-        androidNode.addTopics(emergencyTopic, velocityTopic, interfaceNumberTopic, cameraNumberTopic, cameraPTZTopic, p3dxNumberTopic);
+        androidNode.addTopics(emergencyTopic, interfaceNumberTopic, cameraNumberTopic, p3dxNumberTopic); //velocityTopic ,cameraPTZTopic
         androidNode.addNodeMain(imageStreamNodeMain);
 
         //In case you still need to publish the virtualjoysticks values, set the topicname and then add the joysticks to the AndroidNode
@@ -288,7 +290,7 @@ public class ScreenJoystickInterface extends RosActivity {
             public void run(){
                 while(running){
                     try {
-                        Thread.sleep(10);
+                        Thread.sleep(100);
                         updateVelocity();
                     } catch (InterruptedException e) {
                         e.getStackTrace();
@@ -323,11 +325,13 @@ public class ScreenJoystickInterface extends RosActivity {
     public void onDestroy() {
         emergencyTopic.setPublisher_bool(false);
         nodeMain.forceShutdown();
+        udpComm.destroy();
         running=false;
         super.onDestroy();
     }
 
     private void updateVelocity(){
+
         float steer=joystickPositionNodeMain.getAxisY();
         float acceleration=joystickPositionNodeMain.getAxisX()/2;
 
@@ -350,6 +354,12 @@ public class ScreenJoystickInterface extends RosActivity {
         else if(cameraControlVertical > 0.5f)
             ptz=1;
 
+        String data="velocity;"+acceleration+";"+steer;
+        if(cameraNumberTopic.getPublisher_int()==2 && ptz!=-1)
+            data+=";ptz;"+ptz;
+        udpComm.sendData(data.getBytes());
+
+        /*
         velocityTopic.setPublisher_linear(new float[]{acceleration, 0, 0});
         velocityTopic.setPublisher_angular(new float[]{0, 0, steer});
         velocityTopic.publishNow();
@@ -357,13 +367,13 @@ public class ScreenJoystickInterface extends RosActivity {
         if(cameraNumberTopic.getPublisher_int()==2 && ptz!=-1){
             cameraPTZTopic.setPublisher_int(ptz);
             cameraPTZTopic.publishNow();
-        }
+        }*/
     }
 
     @Override
     protected void init(NodeMainExecutor nodeMainExecutor) {
         nodeMain=(NodeMainExecutorService)nodeMainExecutor;
-        NodeConfiguration nodeConfiguration = NodeConfiguration.newPublic(MainActivity.ROS_HOST, getMasterUri());
+        NodeConfiguration nodeConfiguration = NodeConfiguration.newPublic(MainActivity.ROS_HOSTNAME, getMasterUri());
         nodeMainExecutor.execute(androidNode, nodeConfiguration.setNodeName(androidNode.getName()));
     }
 }

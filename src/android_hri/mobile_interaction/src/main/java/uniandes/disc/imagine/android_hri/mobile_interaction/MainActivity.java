@@ -38,7 +38,9 @@ public class MainActivity extends ActionBarActivity implements PopupMenu.OnMenuI
 
     private static final String TAG = "MainActivity";
     public static String ROS_MASTER = "";
-    public static String ROS_HOST = "";
+    public static String ROS_MASTER_URI = "";
+    public static String ROS_HOSTNAME = "";
+
 
     public static float WORKSPACE_X_OFFSET = 0.2306f;
     public static float WORKSPACE_WIDTH = 0.4889f;
@@ -288,8 +290,9 @@ public class MainActivity extends ActionBarActivity implements PopupMenu.OnMenuI
 
     private boolean isMasterValid(){
 
-        ROS_HOST = hostIP.getText().toString();
-        ROS_MASTER = "http://" + rosIP.getText().toString() + ":" + rosPort.getText().toString();
+        ROS_HOSTNAME = hostIP.getText().toString();
+        ROS_MASTER = rosIP.getText().toString();
+        ROS_MASTER_URI = "http://" + ROS_MASTER + ":" + rosPort.getText().toString();
         int exit = pingHost(rosIP.getText().toString(), 1, false);
         if (exit!=0){
             Toast.makeText(getApplicationContext(), rosIP.getText().toString() + " is not reachable!!!", Toast.LENGTH_LONG).show();

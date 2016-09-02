@@ -24,6 +24,8 @@ public class CompressedImageTopic extends AbstractTopic {
     protected Publisher<CompressedImage> publisher = null;
     protected Subscriber<CompressedImage> subscriber = null;
 
+
+
     protected void setupPublisher(ConnectedNode connectedNode){
         publisher = connectedNode.newPublisher(publisherTopic, CompressedImage._TYPE);
         final CancellableLoop aLoop = new CancellableLoop() {

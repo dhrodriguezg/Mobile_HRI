@@ -20,7 +20,6 @@ import android.widget.ToggleButton;
 import com.leapmotion.leap.Controller;
 import com.leapmotion.leap.Vector;
 
-import org.ros.address.InetAddressFactory;
 import org.ros.android.BitmapFromCompressedImage;
 import org.ros.android.NodeMainExecutorService;
 import org.ros.android.RosActivity;
@@ -102,7 +101,7 @@ public class LeapMotionInterface extends RosActivity implements LeapMotionListen
     private float maxTargetSpeed;
 
     public LeapMotionInterface() {
-        super(TAG, TAG, URI.create(MainActivity.ROS_MASTER));
+        super(TAG, TAG, URI.create(MainActivity.ROS_MASTER_URI));
     }
 
     @Override
@@ -555,7 +554,7 @@ public class LeapMotionInterface extends RosActivity implements LeapMotionListen
     @Override
     protected void init(NodeMainExecutor nodeMainExecutor) {
         nodeMain=(NodeMainExecutorService)nodeMainExecutor;
-        NodeConfiguration nodeConfiguration = NodeConfiguration.newPublic(MainActivity.ROS_HOST, getMasterUri());
+        NodeConfiguration nodeConfiguration = NodeConfiguration.newPublic(MainActivity.ROS_HOSTNAME, getMasterUri());
         nodeMainExecutor.execute(androidNode, nodeConfiguration.setNodeName(androidNode.getName()));
     }
 }

@@ -14,7 +14,6 @@ import android.widget.RelativeLayout;
 import android.widget.Toast;
 import android.widget.ToggleButton;
 
-import org.ros.address.InetAddressFactory;
 import org.ros.android.BitmapFromCompressedImage;
 import org.ros.android.NodeMainExecutorService;
 import org.ros.android.RosActivity;
@@ -28,9 +27,7 @@ import sensor_msgs.CompressedImage;
 import uniandes.disc.imagine.android_hri.mobile_interaction.MainActivity;
 import uniandes.disc.imagine.android_hri.mobile_interaction.R;
 import uniandes.disc.imagine.android_hri.mobile_interaction.topic.BooleanTopic;
-import uniandes.disc.imagine.android_hri.mobile_interaction.topic.Float32Topic;
 import uniandes.disc.imagine.android_hri.mobile_interaction.topic.Int32Topic;
-import uniandes.disc.imagine.android_hri.mobile_interaction.topic.PointTopic;
 import uniandes.disc.imagine.android_hri.mobile_interaction.topic.TwistTopic;
 import uniandes.disc.imagine.android_hri.mobile_interaction.utils.AndroidNode;
 import uniandes.disc.imagine.android_hri.mobile_interaction.utils.Gamepad;
@@ -61,7 +58,7 @@ public class GamepadInterface extends RosActivity {
     private int currentP3DX = -1;
 
     public GamepadInterface() {
-        super(TAG, TAG, URI.create(MainActivity.ROS_MASTER));;
+        super(TAG, TAG, URI.create(MainActivity.ROS_MASTER_URI));;
     }
 
     @Override
@@ -337,7 +334,7 @@ public class GamepadInterface extends RosActivity {
     @Override
     protected void init(NodeMainExecutor nodeMainExecutor) {
         nodeMain=(NodeMainExecutorService)nodeMainExecutor;
-        NodeConfiguration nodeConfiguration = NodeConfiguration.newPublic(MainActivity.ROS_HOST, getMasterUri());
+        NodeConfiguration nodeConfiguration = NodeConfiguration.newPublic(MainActivity.ROS_HOSTNAME, getMasterUri());
         nodeMainExecutor.execute(androidNode, nodeConfiguration.setNodeName(androidNode.getName()));
     }
 }
