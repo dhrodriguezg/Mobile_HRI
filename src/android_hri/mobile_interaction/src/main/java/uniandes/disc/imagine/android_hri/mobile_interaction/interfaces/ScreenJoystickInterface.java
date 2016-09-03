@@ -1,8 +1,11 @@
 package uniandes.disc.imagine.android_hri.mobile_interaction.interfaces;
 
 import android.content.Intent;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.graphics.Color;
 import android.os.Bundle;
+import android.util.Log;
 import android.util.TypedValue;
 import android.view.ViewTreeObserver;
 import android.view.WindowManager;
@@ -20,6 +23,7 @@ import org.ros.node.NodeConfiguration;
 import org.ros.node.NodeMainExecutor;
 
 import java.net.URI;
+import java.nio.ByteBuffer;
 
 import sensor_msgs.CompressedImage;
 import uniandes.disc.imagine.android_hri.mobile_interaction.MainActivity;
@@ -28,6 +32,8 @@ import uniandes.disc.imagine.android_hri.mobile_interaction.topic.BooleanTopic;
 import uniandes.disc.imagine.android_hri.mobile_interaction.topic.Int32Topic;
 import uniandes.disc.imagine.android_hri.mobile_interaction.topic.TwistTopic;
 import uniandes.disc.imagine.android_hri.mobile_interaction.utils.AndroidNode;
+import uniandes.disc.imagine.android_hri.mobile_interaction.utils.MjpegInputStream;
+import uniandes.disc.imagine.android_hri.mobile_interaction.utils.MjpegView;
 import uniandes.disc.imagine.android_hri.mobile_interaction.utils.UDPComm;
 import uniandes.disc.imagine.android_hri.mobile_interaction.widget.CustomVirtualJoystickView;
 
@@ -59,7 +65,8 @@ public class ScreenJoystickInterface extends RosActivity {
     private TwistTopic velocityTopic;
 
     private ImageView targetImage;
-    private UDPComm udpComm;
+    private UDPComm udpCommCommand;
+    private MjpegView mjpegView;
 
     private boolean running=true;
     private float maxTargetSpeed;
@@ -78,7 +85,11 @@ public class ScreenJoystickInterface extends RosActivity {
         getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
 
         maxTargetSpeed=TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, Float.parseFloat(getString(R.string.max_target_speed)), getResources().getDisplayMetrics());
-        udpComm = new UDPComm(MainActivity.ROS_MASTER, 8528);
+        udpCommCommand = new UDPComm(MainActivity.ROS_MASTER, 58528);
+
+        mjpegView = (MjpegView) findViewById(R.id.mjpegView);
+        mjpegView.setDisplayMode(MjpegView.SIZE_BEST_FIT);
+        mjpegView.showFps(true);
 
         joystickPositionNodeMain = (CustomVirtualJoystickView) findViewById(R.id.virtual_joystick_pos);
         joystickRotationNodeMain = (CustomVirtualJoystickView) findViewById(R.id.virtual_joystick_rot);
@@ -118,7 +129,7 @@ public class ScreenJoystickInterface extends RosActivity {
 
         androidNode = new AndroidNode(NODE_NAME);
         androidNode.addTopics(emergencyTopic, interfaceNumberTopic, cameraNumberTopic, p3dxNumberTopic); //velocityTopic ,cameraPTZTopic
-        androidNode.addNodeMain(imageStreamNodeMain);
+        //androidNode.addNodeMain(imageStreamNodeMain);
 
         //In case you still need to publish the virtualjoysticks values, set the topicname and then add the joysticks to the AndroidNode
         //joystickPositionNodeMain.setTopicName(JOYPOS_TOPIC);
@@ -286,8 +297,9 @@ public class ScreenJoystickInterface extends RosActivity {
             }
         });
 
-        Thread threadSlider = new Thread(){
+        Thread threadMjpeg = new Thread(){
             public void run(){
+                mjpegView.setSource(MjpegInputStream.read(MainActivity.ROS_STREAM_URL));
                 while(running){
                     try {
                         Thread.sleep(100);
@@ -298,7 +310,7 @@ public class ScreenJoystickInterface extends RosActivity {
                 }
             }
         };
-        threadSlider.start();
+        threadMjpeg.start();
 
     }
 
@@ -318,6 +330,7 @@ public class ScreenJoystickInterface extends RosActivity {
     @Override
     protected void onPause() {
         emergencyTopic.setPublisher_bool(false);
+        mjpegView.stopPlayback();
         super.onPause();
     }
 
@@ -325,7 +338,7 @@ public class ScreenJoystickInterface extends RosActivity {
     public void onDestroy() {
         emergencyTopic.setPublisher_bool(false);
         nodeMain.forceShutdown();
-        udpComm.destroy();
+        udpCommCommand.destroy();
         running=false;
         super.onDestroy();
     }
@@ -357,7 +370,7 @@ public class ScreenJoystickInterface extends RosActivity {
         String data="velocity;"+acceleration+";"+steer;
         if(cameraNumberTopic.getPublisher_int()==2 && ptz!=-1)
             data+=";ptz;"+ptz;
-        udpComm.sendData(data.getBytes());
+        udpCommCommand.sendData(data.getBytes());
 
         /*
         velocityTopic.setPublisher_linear(new float[]{acceleration, 0, 0});

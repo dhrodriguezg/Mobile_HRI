@@ -5,11 +5,17 @@
     tools:context="uniandes.disc.imagine.android_hri.mobile_interaction"
     android:orientation="horizontal">
 
+    <uniandes.disc.imagine.android_hri.mobile_interaction.utils.MjpegView
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:id="@+id/mjpegView" />
+
     <org.ros.android.view.RosImageView
         android:id="@+id/streamingView"
         android:src="@drawable/loading_wide"
         android:layout_height="match_parent"
-        android:layout_width="match_parent" />
+        android:layout_width="match_parent"
+        android:visibility="gone" />
 
     <ImageView
         android:layout_width="50dp"

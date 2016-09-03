@@ -16,29 +16,71 @@ public class UDPComm {
     private InetAddress ipAddress;
     private String ip;
     private int port;
-    private boolean enabled;
+    private boolean enableTransmission;
+    private boolean enableReception;
+
+    private int receiveBuffer;
+    private byte[] dataToReceive = null;
+    private byte[] dataToSend = null;
 
     public UDPComm(String ip, int port){
         this.ip=ip;
         this.port=port;
-        this.enabled = false;
+        this.enableTransmission = false;
+        this.enableReception = false;
         createSocket();
     }
 
+
+
+    public void sendData(){
+        if( dataToSend!=null && dataToSend.length > 0 )
+            sendData(dataToSend);
+    }
+
+    public void setDatatoSend(byte[] data){
+        dataToSend = data;
+    }
+
+    public void setReceiveDataBuffer(int buffer){
+        receiveBuffer = buffer;
+    }
+
+    public byte[] getReceivedData(){
+        return dataToReceive;
+    }
+
     public void sendData(byte[] data){
-        if( clientSocket==null || clientSocket.isClosed() )
+        if( clientSocket==null )
             createSocket();
 
-        if(!enabled)
+        if(!enableTransmission)
             return;
 
         try {
-            enabled = false;
+            enableTransmission = false;
             DatagramPacket packet = new DatagramPacket(data, data.length, ipAddress, port);
             clientSocket.send(packet);
-            enabled = true;
+            enableTransmission = true;
         } catch (IOException e) {
-            e.printStackTrace();
+        }
+    }
+
+    public void receiveData(){
+        if( clientSocket==null )
+            createSocket();
+
+        if(!enableReception || receiveBuffer == 0 )
+            return;
+
+        try {
+            enableReception = false;
+            byte[] data = new byte[receiveBuffer];
+            DatagramPacket newPacket =  new DatagramPacket(data, data.length);
+            clientSocket.receive(newPacket);
+            dataToReceive = data.clone();
+            enableReception = true;
+        } catch (IOException e) {
         }
     }
 
@@ -46,7 +88,8 @@ public class UDPComm {
         try {
             clientSocket = new DatagramSocket();
             ipAddress = InetAddress.getByName(ip);
-            enabled = true;
+            enableTransmission = true;
+            enableReception = true;
         } catch (UnknownHostException e) {
             e.printStackTrace();
         } catch (SocketException e) {

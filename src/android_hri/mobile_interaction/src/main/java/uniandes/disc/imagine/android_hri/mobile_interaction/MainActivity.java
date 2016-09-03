@@ -40,6 +40,7 @@ public class MainActivity extends ActionBarActivity implements PopupMenu.OnMenuI
     public static String ROS_MASTER = "";
     public static String ROS_MASTER_URI = "";
     public static String ROS_HOSTNAME = "";
+    public static String ROS_STREAM_URL = "";
 
 
     public static float WORKSPACE_X_OFFSET = 0.2306f;
@@ -293,6 +294,7 @@ public class MainActivity extends ActionBarActivity implements PopupMenu.OnMenuI
         ROS_HOSTNAME = hostIP.getText().toString();
         ROS_MASTER = rosIP.getText().toString();
         ROS_MASTER_URI = "http://" + ROS_MASTER + ":" + rosPort.getText().toString();
+        ROS_STREAM_URL = "http://" + ROS_MASTER + ":8080/stream?type=ros_compressed&topic=/android/image_raw";
         int exit = pingHost(rosIP.getText().toString(), 1, false);
         if (exit!=0){
             Toast.makeText(getApplicationContext(), rosIP.getText().toString() + " is not reachable!!!", Toast.LENGTH_LONG).show();
