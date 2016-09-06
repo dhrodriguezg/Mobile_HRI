@@ -101,7 +101,7 @@ public class LeapMotionInterface extends RosActivity implements LeapMotionListen
     private float maxTargetSpeed;
 
     public LeapMotionInterface() {
-        super(TAG, TAG, URI.create(MainActivity.ROS_MASTER_URI));
+        super(TAG, TAG, URI.create(MainActivity.PREFERENCES.getProperty( "ROS_MASTER_URI" )));
     }
 
     @Override
@@ -313,8 +313,8 @@ public class LeapMotionInterface extends RosActivity implements LeapMotionListen
         x=smoothedPos[0]/(float)imageStreamNodeMain.getWidth();
         z=smoothedPos[1]/(float)imageStreamNodeMain.getHeight();
 
-        positionTopic.getPublisher_point()[0] = MainActivity.WORKSPACE_Y_OFFSET - z*MainActivity.WORKSPACE_HEIGHT;
-        positionTopic.getPublisher_point()[1] = MainActivity.WORKSPACE_X_OFFSET - x*MainActivity.WORKSPACE_WIDTH;
+        //positionTopic.getPublisher_point()[0] = MainActivity.WORKSPACE_Y_OFFSET - z*MainActivity.WORKSPACE_HEIGHT;
+        //positionTopic.getPublisher_point()[1] = MainActivity.WORKSPACE_X_OFFSET - x*MainActivity.WORKSPACE_WIDTH;
         positionTopic.publishNow();
 
         float[] smoothedPoint = calculatePoint(imageStreamNodeMain.getDrawable().getIntrinsicWidth()*x, imageStreamNodeMain.getDrawable().getIntrinsicHeight()*z);
@@ -554,7 +554,7 @@ public class LeapMotionInterface extends RosActivity implements LeapMotionListen
     @Override
     protected void init(NodeMainExecutor nodeMainExecutor) {
         nodeMain=(NodeMainExecutorService)nodeMainExecutor;
-        NodeConfiguration nodeConfiguration = NodeConfiguration.newPublic(MainActivity.ROS_HOSTNAME, getMasterUri());
+        NodeConfiguration nodeConfiguration = NodeConfiguration.newPublic( MainActivity.PREFERENCES.getProperty( getString(R.string.HOSTNAME) ), getMasterUri());
         nodeMainExecutor.execute(androidNode, nodeConfiguration.setNodeName(androidNode.getName()));
     }
 }

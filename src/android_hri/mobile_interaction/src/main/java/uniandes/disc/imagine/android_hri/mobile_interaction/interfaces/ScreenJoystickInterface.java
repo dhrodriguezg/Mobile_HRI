@@ -1,17 +1,21 @@
 package uniandes.disc.imagine.android_hri.mobile_interaction.interfaces;
 
+import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Color;
 import android.os.Bundle;
 import android.util.Log;
 import android.util.TypedValue;
+import android.view.View;
 import android.view.ViewTreeObserver;
 import android.view.WindowManager;
 import android.widget.CompoundButton;
 import android.widget.ImageView;
 import android.widget.RelativeLayout;
+import android.widget.TextView;
 import android.widget.Toast;
 import android.widget.ToggleButton;
 
@@ -65,6 +69,7 @@ public class ScreenJoystickInterface extends RosActivity {
     private TwistTopic velocityTopic;
 
     private ImageView targetImage;
+    private TextView textPTZ;
     private UDPComm udpCommCommand;
     private MjpegView mjpegView;
 
@@ -72,7 +77,7 @@ public class ScreenJoystickInterface extends RosActivity {
     private float maxTargetSpeed;
 
     public ScreenJoystickInterface() {
-        super(TAG, TAG, URI.create(MainActivity.ROS_MASTER_URI));;
+        super(TAG, TAG, URI.create(MainActivity.PREFERENCES.getProperty( "ROS_MASTER_URI" )));
     }
 
     @Override
@@ -85,12 +90,15 @@ public class ScreenJoystickInterface extends RosActivity {
         getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
 
         maxTargetSpeed=TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, Float.parseFloat(getString(R.string.max_target_speed)), getResources().getDisplayMetrics());
-        udpCommCommand = new UDPComm(MainActivity.ROS_MASTER, 58528);
+
+        if ( MainActivity.PREFERENCES.containsKey((getString(R.string.udp))) )
+            udpCommCommand = new UDPComm( MainActivity.PREFERENCES.getProperty( getString(R.string.MASTER) ) , Integer.parseInt(getString(R.string.udp_port)));
 
         mjpegView = (MjpegView) findViewById(R.id.mjpegView);
         mjpegView.setDisplayMode(MjpegView.SIZE_BEST_FIT);
         mjpegView.showFps(true);
 
+        textPTZ = (TextView) findViewById(R.id.rotationTextView);
         joystickPositionNodeMain = (CustomVirtualJoystickView) findViewById(R.id.virtual_joystick_pos);
         joystickRotationNodeMain = (CustomVirtualJoystickView) findViewById(R.id.virtual_joystick_rot);
         joystickPositionNodeMain.setHolonomic(true);
@@ -120,7 +128,7 @@ public class ScreenJoystickInterface extends RosActivity {
         p3dxNumberTopic = new Int32Topic();
         p3dxNumberTopic.publishTo(getString(R.string.topic_p3dx_number), false, 10);
         p3dxNumberTopic.setPublishingFreq(10);
-        p3dxNumberTopic.setPublisher_int(-1);
+        p3dxNumberTopic.setPublisher_int(0);
 
         emergencyTopic = new BooleanTopic();
         emergencyTopic.publishTo(getString(R.string.topic_emergencystop), true, 0);
@@ -129,7 +137,15 @@ public class ScreenJoystickInterface extends RosActivity {
 
         androidNode = new AndroidNode(NODE_NAME);
         androidNode.addTopics(emergencyTopic, interfaceNumberTopic, cameraNumberTopic, p3dxNumberTopic); //velocityTopic ,cameraPTZTopic
-        //androidNode.addNodeMain(imageStreamNodeMain);
+
+        if ( MainActivity.PREFERENCES.containsKey((getString(R.string.tcp))) )
+            androidNode.addTopics(velocityTopic ,cameraPTZTopic);
+        if ( MainActivity.PREFERENCES.containsKey((getString(R.string.ros_cimage))) )
+            androidNode.addNodeMain(imageStreamNodeMain);
+        else
+            imageStreamNodeMain.setVisibility( View.GONE );
+        if ( !MainActivity.PREFERENCES.containsKey((getString(R.string.mjpeg))) )
+            mjpegView.setVisibility(View.GONE);
 
         //In case you still need to publish the virtualjoysticks values, set the topicname and then add the joysticks to the AndroidNode
         //joystickPositionNodeMain.setTopicName(JOYPOS_TOPIC);
@@ -188,6 +204,8 @@ public class ScreenJoystickInterface extends RosActivity {
                     toggleCamera4.setChecked(false);
                     cameraNumberTopic.setPublisher_int(0);
                     cameraNumberTopic.publishNow();
+                    joystickRotationNodeMain.setVisibility(View.INVISIBLE);
+                    textPTZ.setVisibility(View.INVISIBLE);
                 }
             }
         });
@@ -203,6 +221,8 @@ public class ScreenJoystickInterface extends RosActivity {
                     toggleCamera4.setChecked(false);
                     cameraNumberTopic.setPublisher_int(1);
                     cameraNumberTopic.publishNow();
+                    joystickRotationNodeMain.setVisibility(View.INVISIBLE);
+                    textPTZ.setVisibility(View.INVISIBLE);
                 }
             }
         });
@@ -218,6 +238,8 @@ public class ScreenJoystickInterface extends RosActivity {
                     toggleCamera4.setChecked(false);
                     cameraNumberTopic.setPublisher_int(2);
                     cameraNumberTopic.publishNow();
+                    joystickRotationNodeMain.setVisibility(View.VISIBLE);
+                    textPTZ.setVisibility(View.VISIBLE);
                 }
             }
         });
@@ -233,6 +255,8 @@ public class ScreenJoystickInterface extends RosActivity {
                     toggleCamera4.setChecked(true);
                     cameraNumberTopic.setPublisher_int(3);
                     cameraNumberTopic.publishNow();
+                    joystickRotationNodeMain.setVisibility(View.INVISIBLE);
+                    textPTZ.setVisibility(View.INVISIBLE);
                 }
             }
         });
@@ -282,10 +306,10 @@ public class ScreenJoystickInterface extends RosActivity {
             }
         });
 
-        toggleP3DX2Control.setOnCheckedChangeListener( new CompoundButton.OnCheckedChangeListener() {
+        toggleP3DX2Control.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
             @Override
             public void onCheckedChanged(CompoundButton toggleButton, boolean isChecked) {
-                if(isChecked){
+                if (isChecked) {
                     Toast.makeText(getApplicationContext(), "Control: P3DX2", Toast.LENGTH_SHORT).show();
                     toggleAllControl.setChecked(false);
                     toggleSimulatorControl.setChecked(false);
@@ -299,7 +323,8 @@ public class ScreenJoystickInterface extends RosActivity {
 
         Thread threadMjpeg = new Thread(){
             public void run(){
-                mjpegView.setSource(MjpegInputStream.read(MainActivity.ROS_STREAM_URL));
+                if ( MainActivity.PREFERENCES.containsKey((getString(R.string.mjpeg))) )
+                    mjpegView.setSource(MjpegInputStream.read(MainActivity.PREFERENCES.getProperty(getString(R.string.STREAM_URL), "")));
                 while(running){
                     try {
                         Thread.sleep(100);
@@ -338,7 +363,8 @@ public class ScreenJoystickInterface extends RosActivity {
     public void onDestroy() {
         emergencyTopic.setPublisher_bool(false);
         nodeMain.forceShutdown();
-        udpCommCommand.destroy();
+        if (udpCommCommand!= null)
+            udpCommCommand.destroy();
         running=false;
         super.onDestroy();
     }
@@ -368,25 +394,26 @@ public class ScreenJoystickInterface extends RosActivity {
             ptz=1;
 
         String data="velocity;"+acceleration+";"+steer;
-        if(cameraNumberTopic.getPublisher_int()==2 && ptz!=-1)
-            data+=";ptz;"+ptz;
-        udpCommCommand.sendData(data.getBytes());
-
-        /*
-        velocityTopic.setPublisher_linear(new float[]{acceleration, 0, 0});
-        velocityTopic.setPublisher_angular(new float[]{0, 0, steer});
-        velocityTopic.publishNow();
-
         if(cameraNumberTopic.getPublisher_int()==2 && ptz!=-1){
             cameraPTZTopic.setPublisher_int(ptz);
+            data+=";ptz;"+ptz;
+        }
+
+        if ( MainActivity.PREFERENCES.containsKey((getString(R.string.udp))) )
+            udpCommCommand.sendData(data.getBytes());
+
+        if ( MainActivity.PREFERENCES.containsKey((getString(R.string.tcp))) ){
+            velocityTopic.setPublisher_linear(new float[]{acceleration, 0, 0});
+            velocityTopic.setPublisher_angular(new float[]{0, 0, steer});
+            velocityTopic.publishNow();
             cameraPTZTopic.publishNow();
-        }*/
+        }
     }
 
     @Override
     protected void init(NodeMainExecutor nodeMainExecutor) {
         nodeMain=(NodeMainExecutorService)nodeMainExecutor;
-        NodeConfiguration nodeConfiguration = NodeConfiguration.newPublic(MainActivity.ROS_HOSTNAME, getMasterUri());
+        NodeConfiguration nodeConfiguration = NodeConfiguration.newPublic( MainActivity.PREFERENCES.getProperty( getString(R.string.HOSTNAME) ) , getMasterUri());
         nodeMainExecutor.execute(androidNode, nodeConfiguration.setNodeName(androidNode.getName()));
     }
 }

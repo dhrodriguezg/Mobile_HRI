@@ -12,6 +12,7 @@ import android.os.Bundle;
 import android.util.TypedValue;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.View;
 import android.view.ViewTreeObserver;
 import android.view.WindowManager;
 import android.widget.CompoundButton;
@@ -37,8 +38,12 @@ import uniandes.disc.imagine.android_hri.mobile_interaction.topic.BooleanTopic;
 import uniandes.disc.imagine.android_hri.mobile_interaction.topic.Float32Topic;
 import uniandes.disc.imagine.android_hri.mobile_interaction.topic.Int32Topic;
 import uniandes.disc.imagine.android_hri.mobile_interaction.topic.PointTopic;
+import uniandes.disc.imagine.android_hri.mobile_interaction.topic.TwistTopic;
 import uniandes.disc.imagine.android_hri.mobile_interaction.touchscreen.MultiGestureArea;
 import uniandes.disc.imagine.android_hri.mobile_interaction.utils.AndroidNode;
+import uniandes.disc.imagine.android_hri.mobile_interaction.utils.MjpegInputStream;
+import uniandes.disc.imagine.android_hri.mobile_interaction.utils.MjpegView;
+import uniandes.disc.imagine.android_hri.mobile_interaction.utils.UDPComm;
 
 
 public class DirectManipulationInterface extends RosActivity implements SensorEventListener {
@@ -60,11 +65,15 @@ public class DirectManipulationInterface extends RosActivity implements SensorEv
     private PointTopic positionTopic;
     private PointTopic rotationTopic;
     private Float32Topic graspTopic;
+    private TwistTopic velocityTopic;
 
     private StringBuffer msg;
     private String moveMsg="";
     private String rotateMsg="";
     private String graspMsg="";
+
+    private UDPComm udpCommCommand;
+    private MjpegView mjpegView;
     private boolean running = true;
 
     private SensorManager senSensorManager;
@@ -73,7 +82,7 @@ public class DirectManipulationInterface extends RosActivity implements SensorEv
     private float maxTargetSpeed;
 
     public DirectManipulationInterface() {
-        super(TAG, TAG, URI.create(MainActivity.ROS_MASTER_URI));
+        super(TAG, TAG, URI.create(MainActivity.PREFERENCES.getProperty( "ROS_MASTER_URI" )));
     }
 
     @Override
@@ -93,8 +102,18 @@ public class DirectManipulationInterface extends RosActivity implements SensorEv
         positionImage = (ImageView) findViewById(R.id.positionView);
         msgText = (TextView) findViewById(R.id.msgTextView);
 
+        if ( MainActivity.PREFERENCES.containsKey((getString(R.string.udp))) )
+            udpCommCommand = new UDPComm( MainActivity.PREFERENCES.getProperty( getString(R.string.MASTER) ) , Integer.parseInt(getString(R.string.udp_port)));
+
+        mjpegView = (MjpegView) findViewById(R.id.mjpegView);
+        mjpegView.setDisplayMode(MjpegView.SIZE_BEST_FIT);
+        mjpegView.showFps(true);
+
         imageStreamNodeMain = (RosImageView<CompressedImage>) findViewById(R.id.streamingView);
-        statelessGestureHandler = new MultiGestureArea(this, imageStreamNodeMain);
+
+        velocityTopic =  new TwistTopic();
+        velocityTopic.publishTo(getString(R.string.topic_rosariavel), false, 10);
+        velocityTopic.setPublishingFreq(100);
 
         imageStreamNodeMain.setTopicName(getString(R.string.topic_streaming));
         imageStreamNodeMain.setMessageType(getString(R.string.topic_streaming_msg));
@@ -129,8 +148,20 @@ public class DirectManipulationInterface extends RosActivity implements SensorEv
         emergencyTopic.setPublisher_bool(true);
 
         androidNode = new AndroidNode(NODE_NAME);
-        androidNode.addTopics(positionTopic, graspTopic, rotationTopic, emergencyTopic, interfaceNumberTopic);
+        androidNode.addTopics( emergencyTopic, interfaceNumberTopic); //positionTopic, graspTopic, rotationTopic,
         androidNode.addNodeMain(imageStreamNodeMain);
+
+        if ( MainActivity.PREFERENCES.containsKey((getString(R.string.tcp))) )
+            androidNode.addTopics(velocityTopic );
+        if ( MainActivity.PREFERENCES.containsKey((getString(R.string.ros_cimage))) ) {
+            androidNode.addNodeMain(imageStreamNodeMain);
+            statelessGestureHandler = new MultiGestureArea(this, imageStreamNodeMain);
+        }else
+            imageStreamNodeMain.setVisibility( View.GONE );
+        if ( !MainActivity.PREFERENCES.containsKey((getString(R.string.mjpeg))) )
+            mjpegView.setVisibility(View.GONE);
+        else
+            statelessGestureHandler = new MultiGestureArea(this, mjpegView);
 
         senSensorManager = (SensorManager) getSystemService(Context.SENSOR_SERVICE);
         senAccelerometer = senSensorManager.getDefaultSensor(Sensor.TYPE_ACCELEROMETER);
@@ -155,12 +186,12 @@ public class DirectManipulationInterface extends RosActivity implements SensorEv
         msg = new StringBuffer();
         Thread threadGestures = new Thread(){
             public void run(){
+                if ( MainActivity.PREFERENCES.containsKey((getString(R.string.mjpeg))) )
+                    mjpegView.setSource(MjpegInputStream.read(MainActivity.PREFERENCES.getProperty(getString(R.string.STREAM_URL), "")));
                 while(running){
                     try {
-                        Thread.sleep(10);
-                        updatePosition();
-                        updateRotation();
-                        updateGrasping();
+                        Thread.sleep(100);
+                        updateVelocity();
                         updateText();
                     } catch (InterruptedException e) {
                         e.getStackTrace();
@@ -189,6 +220,7 @@ public class DirectManipulationInterface extends RosActivity implements SensorEv
     @Override
     protected void onPause() {
         emergencyTopic.setPublisher_bool(false);
+        mjpegView.stopPlayback();
     	super.onPause();
     }
     
@@ -196,6 +228,8 @@ public class DirectManipulationInterface extends RosActivity implements SensorEv
     public void onDestroy() {
         emergencyTopic.setPublisher_bool(false);
         nodeMain.forceShutdown();
+        if (udpCommCommand!= null)
+            udpCommCommand.destroy();
         running=false;
         super.onDestroy();
     }
@@ -210,87 +244,41 @@ public class DirectManipulationInterface extends RosActivity implements SensorEv
         return super.onOptionsItemSelected(item);
     }
 
-    private void smoothMovement(float[] currPos){
-        float dx = currPos[0]-lastPosition[0];
-        float dy = currPos[1]-lastPosition[1];
-        float max = Math.max(Math.abs(dx), Math.abs(dy));
+    private void updateVelocity() {
+        float y = 0.f;
+        float rot = 0.f;
 
-        if(max > maxTargetSpeed){
-            dx=maxTargetSpeed*dx/max;
-            dy=maxTargetSpeed*dy/max;
-        }
-
-        currPos[0]=lastPosition[0]+dx;
-        currPos[1]=lastPosition[1]+dy;
-    }
-
-    private void updatePosition() {
-        final float x,y;
         if(statelessGestureHandler.isDetectingGesture()) {
-            //positionPoint = new float[]{statelessGestureHandler.getPosX(), statelessGestureHandler.getPosY()};
-            x=statelessGestureHandler.getPosX();
-            y=statelessGestureHandler.getPosY();
-            statelessGestureHandler.resetTarget();
-        } else if(statelessGestureHandler.isTargetSelected()) {
-            x=statelessGestureHandler.getTargetX();
-            y=statelessGestureHandler.getTargetY();
-        } else {
-            return;
+            y = -statelessGestureHandler.getPosY();
+            rot = statelessGestureHandler.getRotation();
         }
 
-        float[] positionPoint = new float[]{x,y};
-        float[] positionPixel = new float[2];
-        smoothMovement(positionPoint);
+        float steer = rot/180.f;
+        float acceleration= TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, y, getResources().getDisplayMetrics()) / 1200;
 
-        Matrix streamMatrix = new Matrix();
-        imageStreamNodeMain.getImageMatrix().invert(streamMatrix);
-        streamMatrix.mapPoints(positionPixel, positionPoint);
+        if(Math.abs(steer) < 0.1f)
+            steer=0.f;
+        if(Math.abs(acceleration) < 0.1f)
+            acceleration=0.f;
+        if( acceleration > 0.5f)
+            acceleration=0.5f;
+        else if( acceleration < -0.5f)
+            acceleration=-0.5f;
 
-        this.runOnUiThread(new Runnable() {
-            @Override
-            public void run() {
-                positionImage.setX(x - positionImage.getWidth() / 2);
-                positionImage.setY(y - positionImage.getHeight() / 2);
-            }
-        });
+        String data="velocity;"+acceleration+";"+steer;
 
-        if(!validTarget(positionPixel[0],positionPixel[1]))
-            return;
+        if ( MainActivity.PREFERENCES.containsKey((getString(R.string.udp))) )
+            udpCommCommand.sendData(data.getBytes());
 
-        lastPosition=positionPoint;
-        statelessGestureHandler.syncPos(lastPosition[0], lastPosition[1]);
+        if ( MainActivity.PREFERENCES.containsKey((getString(R.string.tcp))) ){
+            velocityTopic.setPublisher_linear(new float[]{acceleration, 0, 0});
+            velocityTopic.setPublisher_angular(new float[]{0, 0, steer});
+            velocityTopic.publishNow();
+        }
 
-        positionTopic.getPublisher_point()[0] = MainActivity.WORKSPACE_Y_OFFSET - positionPixel[1]*MainActivity.WORKSPACE_HEIGHT/(float) imageStreamNodeMain.getDrawable().getIntrinsicHeight();
-        positionTopic.getPublisher_point()[1] = MainActivity.WORKSPACE_X_OFFSET - positionPixel[0]*MainActivity.WORKSPACE_WIDTH/(float) imageStreamNodeMain.getDrawable().getIntrinsicWidth();
-        positionTopic.getPublisher_point()[2] = 0;
-        positionTopic.publishNow();
-        msg.append(String.format(moveMsg + " | ", positionTopic.getPublisher_point()[0], positionTopic.getPublisher_point()[1]));
-        this.runOnUiThread(new Runnable() {
-            @Override
-            public void run() {
-                targetImage.setX(lastPosition[0] - targetImage.getWidth() / 2);
-                targetImage.setY(lastPosition[1] - targetImage.getHeight() / 2);
-                if(Math.hypot(positionImage.getX()-targetImage.getX(),positionImage.getY()-targetImage.getY())<2)
-                    statelessGestureHandler.resetTarget();
-            }
-        });
+        msg.append(String.format("Steer: %.4f | Throttle: %.4f) ", steer, acceleration ));
     }
 
-    private void updateRotation() {
-        if(!statelessGestureHandler.isDetectingGesture())
-            return;
-        float angle = 0.5f*statelessGestureHandler.getRotation()*3.1416f/180f;
-        msg.append(String.format(rotateMsg + " | ",angle));
-        rotationTopic.getPublisher_point()[0]=0;
-        rotationTopic.getPublisher_point()[1]=angle;
-        rotationTopic.publishNow();
-    }
-
-    private void updateGrasping() {
-        float grasp = statelessGestureHandler.getGrasp();
-        graspTopic.setPublisher_float(grasp);
-        msg.append(String.format(graspMsg, grasp));
-    }
 
     private void updateText() {
         final String message = msg.toString();
@@ -304,35 +292,9 @@ public class DirectManipulationInterface extends RosActivity implements SensorEv
         });
     }
 
-    private boolean validTarget(float x, float y) {
-        if (x < 0 || y < 0)
-            return false;
-        if (x > imageStreamNodeMain.getDrawable().getIntrinsicWidth() ||  y > imageStreamNodeMain.getDrawable().getIntrinsicHeight())
-            return false;
-        return true;
-    }
-
     @Override
     public void onSensorChanged(SensorEvent event) {
-        /*
-        if (event.sensor.getType() == Sensor.TYPE_ACCELEROMETER) {
-            float x = event.values[0];
-            float y = event.values[1];
-            float z = event.values[2];
 
-            z=y-1; //for testing with shield
-            y=x-1;
-
-            if(Math.abs(y)>ROLL_THREASHOLD){
-                rollText.setAlpha(1.f);
-                jawText.setAlpha(.1f);
-            }
-            if(Math.abs(z)>JAW_THREASHOLD) {
-                rollText.setAlpha(.1f);
-                jawText.setAlpha(1.f);
-            }
-        }
-        */
     }
 
     @Override
@@ -343,7 +305,7 @@ public class DirectManipulationInterface extends RosActivity implements SensorEv
     @Override
     protected void init(NodeMainExecutor nodeMainExecutor) {
         nodeMain=(NodeMainExecutorService)nodeMainExecutor;
-        NodeConfiguration nodeConfiguration = NodeConfiguration.newPublic(MainActivity.ROS_HOSTNAME, getMasterUri());
+        NodeConfiguration nodeConfiguration = NodeConfiguration.newPublic( MainActivity.PREFERENCES.getProperty( getString(R.string.HOSTNAME) ), getMasterUri());
         nodeMainExecutor.execute(androidNode, nodeConfiguration.setNodeName(androidNode.getName()));
     }
 

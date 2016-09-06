@@ -2,14 +2,21 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     tools:ignore="ContentDescription"
-    tools:context=".GamepadActivity"
+    tools:context=".GamepadInterface"
     android:orientation="horizontal">
+
+    <uniandes.disc.imagine.android_hri.mobile_interaction.utils.MjpegView
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:id="@+id/mjpegView"
+        android:visibility="visible" />
 
     <org.ros.android.view.RosImageView
         android:id="@+id/streamingView"
         android:src="@drawable/loading_wide"
         android:layout_height="match_parent"
-        android:layout_width="match_parent" />
+        android:layout_width="match_parent"
+        android:visibility="visible" />
 
     <ImageView
         android:layout_width="50dp"
@@ -50,7 +57,8 @@
         android:layout_height="100dp"
         android:layout_alignParentBottom="true"
         android:layout_alignParentRight="true"
-        android:alpha="0.4"/>
+        android:alpha="0.4"
+        android:visibility="invisible" />
 
     <TextView
         android:layout_width="wrap_content"
@@ -63,7 +71,8 @@
         android:layout_gravity="center_vertical"
         android:layout_alignTop="@+id/virtual_joystick_rot"
         android:layout_alignParentRight="true"
-        android:layout_alignLeft="@+id/virtual_joystick_rot" />
+        android:layout_alignLeft="@+id/virtual_joystick_rot"
+        android:visibility="invisible" />
 
     <ImageView
         android:id="@+id/virtual_trigger_close"

@@ -11,10 +11,115 @@
         xmlns:android="http://schemas.android.com/apk/res/android"
         android:layout_width="0dp"
         android:layout_height="match_parent"
+        android:layout_weight="3"
+
+        grid:alignmentMode="alignBounds"
+        grid:rowOrderPreserved="false"
+        grid:useDefaultMargins="true"
+        grid:rowCount="5"
+        grid:columnCount="2"
+        android:layout_marginLeft="3dp"
+        android:layout_marginRight="3dp">
+
+        <TextView
+            android:textAppearance="?android:attr/textAppearanceLarge"
+            android:text="@string/interfaces"
+            android:id="@+id/interfaces"
+            grid:layout_rowWeight="1"
+            grid:layout_columnSpan="2"
+            grid:layout_gravity="center" />
+
+        <TextView
+            android:layout_width="0dp"
+            android:text="@string/interface_gamepad_name"
+            grid:layout_columnWeight="1"
+            grid:layout_rowWeight="1"
+            grid:layout_gravity="fill_horizontal"
+            android:id="@+id/textViewGamepad"
+            android:gravity="center" />
+
+        <TextView
+            android:layout_width="0dp"
+            android:text="@string/interface_screenjoystick_name"
+            grid:layout_columnWeight="1"
+            grid:layout_rowWeight="1"
+            grid:layout_gravity="fill_horizontal"
+            android:id="@+id/textViewController"
+            android:gravity="center" />
+
+        <ImageView
+            android:layout_width="0dp"
+            android:layout_height="0dp"
+            android:src="@drawable/interface_gamepad"
+            grid:layout_columnWeight="1"
+            grid:layout_rowWeight="5"
+            grid:layout_gravity="fill_horizontal"
+            android:id="@+id/imageViewPreviewGamepad" />
+
+        <ImageView
+            android:layout_width="0dp"
+            android:layout_height="0dp"
+            android:gravity="center"
+            android:src="@drawable/interface_screenjoystick"
+            grid:layout_columnWeight="1"
+            grid:layout_rowWeight="5"
+            grid:layout_gravity="fill_horizontal"
+            android:id="@+id/imageViewPreviewController" />
+
+        <TextView
+            android:layout_width="0dp"
+            android:text="@string/interface_directmanipulation_name"
+            grid:layout_columnWeight="1"
+            grid:layout_rowWeight="1"
+            grid:layout_gravity="fill_horizontal"
+            android:id="@+id/textViewDragging"
+            android:gravity="center" />
+
+        <TextView
+            android:layout_width="0dp"
+            android:text="@string/interface_leapmotion_name"
+            grid:layout_columnWeight="1"
+            grid:layout_rowWeight="1"
+            grid:layout_gravity="fill_horizontal"
+            android:id="@+id/textViewLeapMotion"
+            android:gravity="center"
+            android:visibility="invisible" />
+
+        <ImageView
+            android:layout_width="0dp"
+            android:layout_height="0dp"
+            android:src="@drawable/interface_directmanipulation"
+            grid:layout_columnWeight="1"
+            grid:layout_rowWeight="5"
+            grid:layout_gravity="fill_horizontal"
+            android:id="@+id/imageViewPreviewDragging" />
+
+        <ImageView
+            android:layout_width="0dp"
+            android:layout_height="0dp"
+            android:src="@drawable/interface_leapmotion"
+            grid:layout_columnWeight="1"
+            grid:layout_rowWeight="5"
+            grid:layout_gravity="fill_horizontal"
+            android:id="@+id/imageViewPreviewLeapMotion"
+            android:visibility="invisible" />
+
+    </android.support.v7.widget.GridLayout>
+
+    <View
+        android:layout_width="5dp"
+        android:layout_height="match_parent"
+        android:background="@android:color/darker_gray"/>
+
+    <android.support.v7.widget.GridLayout
+        xmlns:android="http://schemas.android.com/apk/res/android"
+        android:layout_width="0dp"
+        android:layout_height="match_parent"
         android:layout_weight="4"
         grid:rowCount="6"
         grid:columnCount="3"
         grid:orientation="horizontal"
+        android:layout_marginRight="3dp"
         android:layout_marginLeft="3dp">
 
         <TextView
@@ -90,121 +195,78 @@
             grid:layout_gravity="center"
             grid:layout_rowWeight="1"/>
 
+        <TextView
+            android:text="@string/stream"
+            android:id="@+id/streamText"
+            grid:layout_gravity="left"
+            grid:layout_rowWeight="1"/>
+
+        <RadioGroup
+            android:id="@+id/streamPref"
+            android:orientation="horizontal"
+            grid:layout_columnSpan="2"
+            grid:layout_rowWeight="1"
+            >
+
+            <RadioButton
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/mjpeg"
+                android:id="@+id/streamMjpeg"
+                android:checked="true" />
+
+            <RadioButton
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/ros_cimage"
+                android:id="@+id/streamROSCImage" />
+
+        </RadioGroup>
+
+        <TextView
+            android:text="@string/control"
+            android:id="@+id/controlText"
+            grid:layout_gravity="left"
+            grid:layout_rowWeight="1"/>
+
+        <RadioGroup
+            android:id="@+id/controlPref"
+            android:orientation="horizontal"
+            grid:layout_columnSpan="2"
+            grid:layout_rowWeight="1" >
+
+            <RadioButton
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/udp"
+                android:id="@+id/controlUDP"
+                android:checked="true" />
+
+            <RadioButton
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/tcp"
+                android:id="@+id/controlTCP" />
+
+        </RadioGroup>
+
         <Button
             android:text="@string/setup"
             android:id="@+id/calibrationButton"
             grid:layout_columnWeight="1"
-            grid:layout_rowWeight="1"/>
+            grid:layout_rowWeight="1"
+            android:visibility="gone" />
 
         <Button
             android:text="@string/camera"
             android:id="@+id/cameraButton"
             grid:layout_columnWeight="1"
-            grid:layout_rowWeight="1"/>
+            grid:layout_rowWeight="1"
+            android:visibility="gone" />
+
+
 
     </android.support.v7.widget.GridLayout>
-
-    <View
-        android:layout_width="5dp"
-        android:layout_height="match_parent"
-        android:background="@android:color/darker_gray"/>
-
-    <android.support.v7.widget.GridLayout
-        xmlns:android="http://schemas.android.com/apk/res/android"
-        android:layout_width="0dp"
-        android:layout_height="match_parent"
-        android:layout_weight="3"
-
-        grid:alignmentMode="alignBounds"
-        grid:rowOrderPreserved="false"
-        grid:useDefaultMargins="true"
-        grid:rowCount="5"
-        grid:columnCount="2"
-        android:layout_marginLeft="3dp">
-
-        <TextView
-            android:textAppearance="?android:attr/textAppearanceLarge"
-            android:text="@string/interfaces"
-            android:id="@+id/interfaces"
-            grid:layout_rowWeight="1"
-            grid:layout_columnSpan="2"
-            grid:layout_gravity="center" />
-
-        <TextView
-            android:layout_width="0dp"
-            android:text="@string/interface_gamepad_name"
-            grid:layout_columnWeight="1"
-            grid:layout_rowWeight="1"
-            grid:layout_gravity="fill_horizontal"
-            android:id="@+id/textViewGamepad"
-            android:gravity="center" />
-
-        <TextView
-            android:layout_width="0dp"
-            android:text="@string/interface_screenjoystick_name"
-            grid:layout_columnWeight="1"
-            grid:layout_rowWeight="1"
-            grid:layout_gravity="fill_horizontal"
-            android:id="@+id/textViewController"
-            android:gravity="center" />
-
-        <ImageView
-            android:layout_width="0dp"
-            android:layout_height="0dp"
-            android:src="@drawable/interface_gamepad"
-            grid:layout_columnWeight="1"
-            grid:layout_rowWeight="5"
-            grid:layout_gravity="fill_horizontal"
-            android:id="@+id/imageViewPreviewGamepad" />
-
-        <ImageView
-            android:layout_width="0dp"
-            android:layout_height="0dp"
-            android:gravity="center"
-            android:src="@drawable/interface_screenjoystick"
-            grid:layout_columnWeight="1"
-            grid:layout_rowWeight="5"
-            grid:layout_gravity="fill_horizontal"
-            android:id="@+id/imageViewPreviewController" />
-
-        <TextView
-            android:layout_width="0dp"
-            android:text="@string/interface_directmanipulation_name"
-            grid:layout_columnWeight="1"
-            grid:layout_rowWeight="1"
-            grid:layout_gravity="fill_horizontal"
-            android:id="@+id/textViewDragging"
-            android:gravity="center" />
-
-        <TextView
-            android:layout_width="0dp"
-            android:text="@string/interface_leapmotion_name"
-            grid:layout_columnWeight="1"
-            grid:layout_rowWeight="1"
-            grid:layout_gravity="fill_horizontal"
-            android:id="@+id/textViewLeapMotion"
-            android:gravity="center" />
-
-        <ImageView
-            android:layout_width="0dp"
-            android:layout_height="0dp"
-            android:src="@drawable/interface_directmanipulation"
-            grid:layout_columnWeight="1"
-            grid:layout_rowWeight="5"
-            grid:layout_gravity="fill_horizontal"
-            android:id="@+id/imageViewPreviewDragging" />
-
-        <ImageView
-            android:layout_width="0dp"
-            android:layout_height="0dp"
-            android:src="@drawable/interface_leapmotion"
-            grid:layout_columnWeight="1"
-            grid:layout_rowWeight="5"
-            grid:layout_gravity="fill_horizontal"
-            android:id="@+id/imageViewPreviewLeapMotion" />
-
-    </android.support.v7.widget.GridLayout>
-
 
 
 </LinearLayout>

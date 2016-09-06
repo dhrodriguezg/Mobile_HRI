@@ -52,7 +52,7 @@ public class CameraActivity extends RosActivity {
     private boolean firstRun=true;
 
     public CameraActivity() {
-        super(TAG, TAG, URI.create(MainActivity.ROS_MASTER_URI));
+        super(TAG, TAG, URI.create(MainActivity.PREFERENCES.getProperty( "ROS_MASTER_URI" )));
     }
 
     @Override

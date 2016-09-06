@@ -5,11 +5,18 @@
     tools:context=".DraggingActivity"
     android:orientation="horizontal">
 
+    <uniandes.disc.imagine.android_hri.mobile_interaction.utils.MjpegView
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:id="@+id/mjpegView"
+        android:visibility="visible" />
+
     <org.ros.android.view.RosImageView
         android:id="@+id/streamingView"
         android:layout_height="match_parent"
         android:layout_width="match_parent"
-        android:src="@drawable/loading_wide" />
+        android:src="@drawable/loading_wide"
+        android:visibility="visible" />
 
     <ImageView
         android:layout_width="50dp"
@@ -19,7 +26,8 @@
         android:layout_centerVertical="true"
         android:layout_alignParentRight="true"
         android:layout_marginRight="120dp"
-        android:alpha="0.3" />
+        android:alpha="0.3"
+        android:visibility="gone" />
 
     <ImageView
         android:layout_width="50dp"
@@ -28,7 +36,8 @@
         android:id="@+id/targetView"
         android:layout_centerVertical="true"
         android:layout_alignParentRight="true"
-        android:layout_marginRight="120dp" />
+        android:layout_marginRight="120dp"
+        android:visibility="gone" />
 
     <TextView
         android:layout_width="match_parent"
@@ -59,6 +68,7 @@
         android:id="@+id/targetCenter"
         android:layout_centerVertical="true"
         android:layout_centerHorizontal="true"
-        android:alpha="0.7"/>
+        android:alpha="0.7"
+        android:visibility="gone" />
 
 </RelativeLayout>

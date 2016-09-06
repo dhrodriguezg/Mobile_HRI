@@ -6,11 +6,13 @@ import android.os.Bundle;
 import android.util.TypedValue;
 import android.view.KeyEvent;
 import android.view.MotionEvent;
+import android.view.View;
 import android.view.ViewTreeObserver;
 import android.view.WindowManager;
 import android.widget.CompoundButton;
 import android.widget.ImageView;
 import android.widget.RelativeLayout;
+import android.widget.TextView;
 import android.widget.Toast;
 import android.widget.ToggleButton;
 
@@ -31,6 +33,9 @@ import uniandes.disc.imagine.android_hri.mobile_interaction.topic.Int32Topic;
 import uniandes.disc.imagine.android_hri.mobile_interaction.topic.TwistTopic;
 import uniandes.disc.imagine.android_hri.mobile_interaction.utils.AndroidNode;
 import uniandes.disc.imagine.android_hri.mobile_interaction.utils.Gamepad;
+import uniandes.disc.imagine.android_hri.mobile_interaction.utils.MjpegInputStream;
+import uniandes.disc.imagine.android_hri.mobile_interaction.utils.MjpegView;
+import uniandes.disc.imagine.android_hri.mobile_interaction.utils.UDPComm;
 
 public class GamepadInterface extends RosActivity {
 
@@ -54,11 +59,16 @@ public class GamepadInterface extends RosActivity {
     private boolean changingCamera=false;
     private boolean changingP3DX=false;
 
+    private ImageView joystickRotationNodeMain;
+    private TextView textPTZ;
+    private UDPComm udpCommCommand;
+    private MjpegView mjpegView;
+
     private int currentCamera = 0;
     private int currentP3DX = -1;
 
     public GamepadInterface() {
-        super(TAG, TAG, URI.create(MainActivity.ROS_MASTER_URI));;
+        super(TAG, TAG, URI.create(MainActivity.PREFERENCES.getProperty( "ROS_MASTER_URI" )));
     }
 
     @Override
@@ -72,8 +82,16 @@ public class GamepadInterface extends RosActivity {
 
         imageStreamNodeMain = (RosImageView<CompressedImage>) findViewById(R.id.streamingView);
 
-        targetImage = (ImageView) findViewById(R.id.targetView);
+        if ( MainActivity.PREFERENCES.containsKey((getString(R.string.udp))) )
+            udpCommCommand = new UDPComm( MainActivity.PREFERENCES.getProperty( getString(R.string.MASTER) ) , Integer.parseInt(getString(R.string.udp_port)) );
 
+        mjpegView = (MjpegView) findViewById(R.id.mjpegView);
+        mjpegView.setDisplayMode(MjpegView.SIZE_BEST_FIT);
+        mjpegView.showFps(true);
+
+        textPTZ = (TextView) findViewById(R.id.rotationTextView);
+        joystickRotationNodeMain = (ImageView) findViewById(R.id.virtual_joystick_rot);
+        targetImage = (ImageView) findViewById(R.id.targetView);
         velocityTopic = new TwistTopic();
         velocityTopic.publishTo(getString(R.string.topic_rosariavel), false, 10);
         velocityTopic.setPublishingFreq(100);
@@ -104,8 +122,17 @@ public class GamepadInterface extends RosActivity {
         emergencyTopic.setPublisher_bool(true);
 
         androidNode = new AndroidNode(NODE_NAME);
-        androidNode.addTopics(emergencyTopic, velocityTopic, interfaceNumberTopic, cameraNumberTopic, cameraPTZTopic, p3dxNumberTopic);
-        androidNode.addNodeMain(imageStreamNodeMain);
+        androidNode.addTopics(emergencyTopic, interfaceNumberTopic, cameraNumberTopic, p3dxNumberTopic);
+        //androidNode.addNodeMain(imageStreamNodeMain);
+
+        if ( MainActivity.PREFERENCES.containsKey((getString(R.string.tcp))) )
+            androidNode.addTopics(velocityTopic ,cameraPTZTopic);
+        if ( MainActivity.PREFERENCES.containsKey((getString(R.string.ros_cimage))) )
+            androidNode.addNodeMain(imageStreamNodeMain);
+        else
+            imageStreamNodeMain.setVisibility( View.GONE );
+        if ( !MainActivity.PREFERENCES.containsKey((getString(R.string.mjpeg))) )
+            mjpegView.setVisibility(View.GONE);
 
         gamepad = new Gamepad(this);
 
@@ -158,9 +185,11 @@ public class GamepadInterface extends RosActivity {
 
         Thread threadGamepad = new Thread(){
             public void run(){
+                if ( MainActivity.PREFERENCES.containsKey((getString(R.string.mjpeg))) )
+                    mjpegView.setSource(MjpegInputStream.read(MainActivity.PREFERENCES.getProperty(getString(R.string.STREAM_URL), "")));
                 while(running){
                     try {
-                        Thread.sleep(10);
+                        Thread.sleep(100);
                         updateVelocity();
                     } catch (InterruptedException e) {
                         e.getStackTrace();
@@ -187,6 +216,7 @@ public class GamepadInterface extends RosActivity {
     @Override
     protected void onPause() {
         emergencyTopic.setPublisher_bool(false);
+        mjpegView.stopPlayback();
         super.onPause();
     }
 
@@ -194,6 +224,8 @@ public class GamepadInterface extends RosActivity {
     public void onDestroy() {
         emergencyTopic.setPublisher_bool(false);
         nodeMain.forceShutdown();
+        if (udpCommCommand!= null)
+            udpCommCommand.destroy();
         running=false;
         super.onDestroy();
     }
@@ -215,6 +247,7 @@ public class GamepadInterface extends RosActivity {
             return;
         float steer=-gamepad.getAxisValue(MotionEvent.AXIS_X);
         float acceleration=-gamepad.getAxisValue(MotionEvent.AXIS_Y)/2f;
+        acceleration += (gamepad.getAxisValue(MotionEvent.AXIS_RTRIGGER) - gamepad.getAxisValue(MotionEvent.AXIS_LTRIGGER))/2f;
 
         float cameraControlHorizontal= gamepad.getAxisValue(MotionEvent.AXIS_Z);
         float cameraControlVertical=-gamepad.getAxisValue(MotionEvent.AXIS_RZ);
@@ -236,23 +269,36 @@ public class GamepadInterface extends RosActivity {
         else if(cameraControlVertical > 0.5f)
             ptz=1;
 
-        velocityTopic.setPublisher_linear(new float[]{acceleration, 0, 0});
-        velocityTopic.setPublisher_angular(new float[]{0, 0, steer});
-        velocityTopic.publishNow();
-
-        if(currentCamera==2 && ptz!=-1){
+        String data="velocity;"+acceleration+";"+steer;
+        if(cameraNumberTopic.getPublisher_int()==2 && ptz!=-1){
             cameraPTZTopic.setPublisher_int(ptz);
-            cameraPTZTopic.publishNow();
-
+            data+=";ptz;"+ptz;
         }
 
+        if ( MainActivity.PREFERENCES.containsKey((getString(R.string.udp))) )
+            udpCommCommand.sendData(data.getBytes());
+
+        if ( MainActivity.PREFERENCES.containsKey((getString(R.string.tcp))) ){
+            velocityTopic.setPublisher_linear(new float[]{acceleration, 0, 0});
+            velocityTopic.setPublisher_angular(new float[]{0, 0, steer});
+            velocityTopic.publishNow();
+            cameraPTZTopic.publishNow();
+        }
+
+        if( gamepad.getButtonValue(KeyEvent.KEYCODE_DPAD_LEFT) == 1)
+            changeCamera(0);
+        else if( gamepad.getButtonValue(KeyEvent.KEYCODE_DPAD_UP) == 1)
+            changeCamera(1);
+        else if( gamepad.getButtonValue(KeyEvent.KEYCODE_DPAD_RIGHT) == 1)
+            changeCamera(2);
+
         if( gamepad.getButtonValue(KeyEvent.KEYCODE_BUTTON_A) == 1)
-            changeCamera();
-        if( gamepad.getButtonValue(KeyEvent.KEYCODE_BUTTON_Y) == 1)
-            changeP3DX();
+            changeP3DX(0);
+        else if( gamepad.getButtonValue(KeyEvent.KEYCODE_BUTTON_B) == 1)
+            changeP3DX(1);
     }
 
-    private void changeCamera(){
+    private void changeCamera(final int camera){
         if (changingCamera)
             return;
 
@@ -260,20 +306,29 @@ public class GamepadInterface extends RosActivity {
             public void run(){
                 changingCamera=true;
                 currentCamera++;
-                if(currentCamera>3)
-                    currentCamera=0;
-                cameraNumberTopic.setPublisher_int(currentCamera);
+                if(currentCamera > 2)
+                    currentCamera = 0;
+                cameraNumberTopic.setPublisher_int(camera);
                 cameraNumberTopic.publishNow();
 
                 String msg = "Camera: ";
-                if(currentCamera==0)
-                    msg+= "Simulation";
-                else if(currentCamera==1)
+                if(currentCamera==0) {
+                    msg += "Simulation";
+                    changeVisibility(joystickRotationNodeMain, View.INVISIBLE);
+                    changeVisibility(textPTZ , View.INVISIBLE);
+                }else if(currentCamera==1){
                     msg+= "Top-Down";
-                else if(currentCamera==2)
+                    changeVisibility(joystickRotationNodeMain, View.INVISIBLE);
+                    changeVisibility(textPTZ , View.INVISIBLE);
+                }else if(currentCamera==2){
                     msg+= "First Person";
-                else if(currentCamera==3)
-                    msg+= "Web Cam";
+                    changeVisibility(joystickRotationNodeMain, View.VISIBLE);
+                    changeVisibility(textPTZ , View.VISIBLE);
+                }else if(currentCamera==3) {
+                    msg += "Web Cam";
+                    changeVisibility(joystickRotationNodeMain, View.INVISIBLE);
+                    changeVisibility(textPTZ, View.INVISIBLE);
+                }
                 showToast(msg);
 
                 try {
@@ -287,16 +342,16 @@ public class GamepadInterface extends RosActivity {
         threadCamera.start();
     }
 
-    private void changeP3DX(){
+    private void changeP3DX(final int p3dx){
         if (changingP3DX)
             return;
         Thread threadCamera = new Thread(){
             public void run(){
                 changingP3DX=true;
                 currentP3DX++;
-                if(currentP3DX>2)
-                    currentP3DX=-1;
-                p3dxNumberTopic.setPublisher_int(currentP3DX);
+                if(currentP3DX > 2)
+                    currentP3DX=0;
+                p3dxNumberTopic.setPublisher_int(p3dx);
                 p3dxNumberTopic.publishNow();
 
                 String msg = "Control: ";
@@ -321,6 +376,14 @@ public class GamepadInterface extends RosActivity {
         threadCamera.start();
     }
 
+    public void changeVisibility(final View view, final int visibility){
+        runOnUiThread(new Runnable() {
+            public void run() {
+                view.setVisibility( visibility );
+            }
+        });
+    }
+
     public void showToast(final String msg) {
 
         runOnUiThread(new Runnable() {
@@ -334,7 +397,7 @@ public class GamepadInterface extends RosActivity {
     @Override
     protected void init(NodeMainExecutor nodeMainExecutor) {
         nodeMain=(NodeMainExecutorService)nodeMainExecutor;
-        NodeConfiguration nodeConfiguration = NodeConfiguration.newPublic(MainActivity.ROS_HOSTNAME, getMasterUri());
+        NodeConfiguration nodeConfiguration = NodeConfiguration.newPublic( MainActivity.PREFERENCES.getProperty( getString(R.string.HOSTNAME) ), getMasterUri());
         nodeMainExecutor.execute(androidNode, nodeConfiguration.setNodeName(androidNode.getName()));
     }
 }

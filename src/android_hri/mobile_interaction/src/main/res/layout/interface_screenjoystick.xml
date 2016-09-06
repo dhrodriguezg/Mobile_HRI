@@ -2,20 +2,21 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     tools:ignore="ContentDescription"
-    tools:context="uniandes.disc.imagine.android_hri.mobile_interaction"
+    tools:context="ScreenJoystickInterface"
     android:orientation="horizontal">
 
     <uniandes.disc.imagine.android_hri.mobile_interaction.utils.MjpegView
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:id="@+id/mjpegView" />
+        android:id="@+id/mjpegView"
+        android:visibility="visible" />
 
     <org.ros.android.view.RosImageView
         android:id="@+id/streamingView"
         android:src="@drawable/loading_wide"
         android:layout_height="match_parent"
         android:layout_width="match_parent"
-        android:visibility="gone" />
+        android:visibility="visible" />
 
     <ImageView
         android:layout_width="50dp"
@@ -51,14 +52,19 @@
             android:layout_width="120dp"
             android:layout_height="120dp"
             android:layout_alignParentBottom="true"
-            android:layout_alignParentLeft="true" />
+            android:layout_alignParentLeft="true"
+            android:layout_marginLeft="5dp"
+            android:layout_marginBottom="5dp" />
 
         <uniandes.disc.imagine.android_hri.mobile_interaction.widget.CustomVirtualJoystickView
             android:id="@+id/virtual_joystick_rot"
             android:layout_width="120dp"
             android:layout_height="120dp"
             android:layout_alignParentBottom="true"
-            android:layout_alignParentRight="true" />
+            android:layout_alignParentRight="true"
+            android:visibility="invisible"
+            android:layout_marginRight="5dp"
+            android:layout_marginBottom="5dp" />
 
         <TextView
             android:layout_width="wrap_content"
@@ -70,7 +76,9 @@
             android:layout_alignLeft="@+id/virtual_joystick_rot"
             android:layout_alignParentRight="true"
             android:gravity="center_vertical|center_horizontal"
-            android:textColor="#ffd9d9d9" />
+            android:textColor="#ffd9d9d9"
+            android:visibility="invisible"
+            android:layout_marginRight="5dp" />
 
         <TextView
             android:layout_width="wrap_content"
@@ -83,7 +91,8 @@
             android:layout_gravity="center_vertical"
             android:layout_alignTop="@+id/virtual_joystick_pos"
             android:layout_alignParentLeft="true"
-            android:layout_alignRight="@+id/virtual_joystick_pos" />
+            android:layout_alignRight="@+id/virtual_joystick_pos"
+            android:layout_marginLeft="5dp" />
 
         <ToggleButton
             android:layout_width="wrap_content"
@@ -132,13 +141,14 @@
             android:layout_below="@+id/toggleCamera3"
             android:layout_alignParentRight="true"
             android:layout_alignLeft="@+id/toggleCamera1"
-            android:layout_marginTop="5dp" />
+            android:layout_marginTop="5dp"
+            android:visibility="gone" />
 
         <ImageView
             android:layout_width="30dp"
             android:layout_height="45dp"
-            android:id="@+id/imageAll"
-            android:src="@drawable/all_control"
+            android:id="@+id/imageSimulator"
+            android:src="@drawable/sim_control"
             android:layout_alignParentTop="true"
             android:layout_alignParentLeft="true"
             android:layout_marginTop="5dp"
@@ -147,31 +157,9 @@
         <ToggleButton
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:textOn="@string/all_control"
-            android:textOff="@string/all_control"
-            android:checked="true"
-            android:id="@+id/toggleAllControl"
-            android:layout_toRightOf="@+id/imageAll"
-            android:layout_alignTop="@+id/imageAll"
-            android:layout_alignBottom="@+id/imageAll"
-            android:layout_alignRight="@+id/virtual_joystick_pos"/>
-
-        <ImageView
-            android:layout_width="wrap_content"
-            android:layout_height="45dp"
-            android:id="@+id/imageSimulator"
-            android:src="@drawable/sim_control"
-            android:layout_below="@+id/imageAll"
-            android:layout_alignLeft="@+id/imageAll"
-            android:layout_alignRight="@+id/imageAll"
-            android:layout_marginTop="5dp"/>
-
-        <ToggleButton
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
             android:textOn="@string/sim_control"
             android:textOff="@string/sim_control"
-            android:checked="false"
+            android:checked="true"
             android:id="@+id/toggleSimulatorControl"
             android:layout_toRightOf="@+id/imageSimulator"
             android:layout_alignTop="@+id/imageSimulator"
@@ -208,7 +196,8 @@
             android:layout_below="@+id/imageP3DX1"
             android:layout_alignLeft="@+id/imageP3DX1"
             android:layout_alignRight="@+id/imageP3DX1"
-            android:layout_marginTop="5dp"/>
+            android:layout_marginTop="5dp"
+            android:visibility="gone" />
 
         <ToggleButton
             android:layout_width="wrap_content"
@@ -220,7 +209,32 @@
             android:layout_toRightOf="@+id/imageP3DX2"
             android:layout_alignTop="@+id/imageP3DX2"
             android:layout_alignBottom="@+id/imageP3DX2"
-            android:layout_alignRight="@+id/virtual_joystick_pos"/>
+            android:layout_alignRight="@+id/virtual_joystick_pos"
+            android:visibility="gone" />
+
+        <ImageView
+            android:layout_width="wrap_content"
+            android:layout_height="45dp"
+            android:id="@+id/imageAll"
+            android:src="@drawable/all_control"
+            android:layout_below="@+id/imageP3DX2"
+            android:layout_alignLeft="@+id/imageP3DX2"
+            android:layout_alignRight="@+id/imageP3DX2"
+            android:layout_marginTop="5dp"
+            android:visibility="gone" />
+
+        <ToggleButton
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textOn="@string/all_control"
+            android:textOff="@string/all_control"
+            android:checked="false"
+            android:id="@+id/toggleAllControl"
+            android:layout_toRightOf="@+id/imageAll"
+            android:layout_alignTop="@+id/imageAll"
+            android:layout_alignBottom="@+id/imageAll"
+            android:layout_alignRight="@+id/virtual_joystick_pos"
+            android:visibility="gone" />
 
         <ToggleButton
             android:layout_width="wrap_content"

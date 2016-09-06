@@ -4,7 +4,6 @@ import android.content.Intent;
 import android.content.res.Configuration;
 import android.os.Bundle;
 import android.support.v7.app.ActionBarActivity;
-import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -12,6 +11,7 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.PopupMenu;
+import android.widget.RadioGroup;
 import android.widget.Toast;
 
 import org.ros.address.InetAddressFactory;
@@ -27,6 +27,7 @@ import java.net.SocketException;
 import java.text.DecimalFormat;
 import java.util.Enumeration;
 import java.util.Locale;
+import java.util.Properties;
 import java.util.TreeMap;
 
 import uniandes.disc.imagine.android_hri.mobile_interaction.interfaces.DirectManipulationInterface;
@@ -37,16 +38,8 @@ import uniandes.disc.imagine.android_hri.mobile_interaction.interfaces.ScreenJoy
 public class MainActivity extends ActionBarActivity implements PopupMenu.OnMenuItemClickListener {
 
     private static final String TAG = "MainActivity";
-    public static String ROS_MASTER = "";
-    public static String ROS_MASTER_URI = "";
-    public static String ROS_HOSTNAME = "";
-    public static String ROS_STREAM_URL = "";
 
-
-    public static float WORKSPACE_X_OFFSET = 0.2306f;
-    public static float WORKSPACE_WIDTH = 0.4889f;
-    public static float WORKSPACE_Y_OFFSET = 0.9100f;
-    public static float WORKSPACE_HEIGHT = 0.3546f;
+    public static Properties PREFERENCES;
 
     private EditText rosIP;
     private EditText rosPort;
@@ -58,6 +51,8 @@ public class MainActivity extends ActionBarActivity implements PopupMenu.OnMenuI
     private ImageView interface_4;
     private MenuItem[] language;
     private PopupMenu deviceIps;
+    private RadioGroup streamPref;
+    private RadioGroup controlPref;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -68,6 +63,7 @@ public class MainActivity extends ActionBarActivity implements PopupMenu.OnMenuI
 
     private void loadGUI(){
         setContentView(R.layout.activity_main);
+
         rosIP = (EditText) findViewById(R.id.editIP);
         rosPort = (EditText) findViewById(R.id.editPort);
         hostIP = (EditText) findViewById(R.id.hostNameIP);
@@ -75,13 +71,13 @@ public class MainActivity extends ActionBarActivity implements PopupMenu.OnMenuI
         interface_2 = (ImageView) findViewById(R.id.imageViewPreviewDragging);
         interface_3 = (ImageView) findViewById(R.id.imageViewPreviewGamepad);
         interface_4 = (ImageView) findViewById(R.id.imageViewPreviewLeapMotion);
-        WORKSPACE_X_OFFSET= Float.parseFloat(getString(R.string.workspace_xoffset));
-        WORKSPACE_WIDTH= Float.parseFloat(getString(R.string.workspace_width));
-        WORKSPACE_Y_OFFSET= Float.parseFloat(getString(R.string.workspace_yoffset));
-        WORKSPACE_HEIGHT= Float.parseFloat(getString(R.string.workspace_height));
+        streamPref = (RadioGroup) findViewById(R.id.streamPref);
+        controlPref = (RadioGroup) findViewById(R.id.controlPref);
 
-        if(hostNameIPs.containsKey("ppp0"))
-            hostIP.setText(hostNameIPs.get("ppp0"));
+        PREFERENCES = new Properties();
+
+        if(hostNameIPs.containsKey( getString(R.string.default_comm) ))
+            hostIP.setText(hostNameIPs.get( getString(R.string.default_comm) ));
         else
             hostIP.setText(InetAddressFactory.newNonLoopback().getHostAddress());
         deviceIps = new PopupMenu( this, hostIP);
@@ -220,7 +216,7 @@ public class MainActivity extends ActionBarActivity implements PopupMenu.OnMenuI
     }
 
     private void startSendingPing(){
-        int exit = pingHost(rosIP.getText().toString(), 10, true);
+        int exit = pingHost(rosIP.getText().toString(), 5, true);
         if (exit!=0){
             Toast.makeText(getApplicationContext(), rosIP.getText().toString() + " is not reachable!!!", Toast.LENGTH_LONG).show();
         }
@@ -280,7 +276,6 @@ public class MainActivity extends ActionBarActivity implements PopupMenu.OnMenuI
                     InetAddress inetAddress = inetAddresses.nextElement();
                     if ( !inetAddress.getHostAddress().contains("%") || !inetAddress.getHostAddress().contains(":")) {
                         hostNameIPs.put(networkInterface.getName(), inetAddress.getHostAddress());
-                        Log.i("Network ",networkInterface.getName() +" : " + inetAddress.getHostAddress());
                     }
                 }
             }
@@ -291,15 +286,31 @@ public class MainActivity extends ActionBarActivity implements PopupMenu.OnMenuI
 
     private boolean isMasterValid(){
 
-        ROS_HOSTNAME = hostIP.getText().toString();
-        ROS_MASTER = rosIP.getText().toString();
-        ROS_MASTER_URI = "http://" + ROS_MASTER + ":" + rosPort.getText().toString();
-        ROS_STREAM_URL = "http://" + ROS_MASTER + ":8080/stream?type=ros_compressed&topic=/android/image_raw";
         int exit = pingHost(rosIP.getText().toString(), 1, false);
         if (exit!=0){
             Toast.makeText(getApplicationContext(), rosIP.getText().toString() + " is not reachable!!!", Toast.LENGTH_LONG).show();
             return false;
         }
+
+        PREFERENCES.clear();
+        PREFERENCES.setProperty( getString(R.string.HOSTNAME), hostIP.getText().toString());
+        PREFERENCES.setProperty( getString(R.string.MASTER), rosIP.getText().toString());
+        PREFERENCES.setProperty( getString(R.string.MASTER_URI), "http://" + rosIP.getText().toString() + ":" + rosPort.getText().toString() );
+        PREFERENCES.setProperty(getString(R.string.STREAM_URL), "http://" + rosIP.getText().toString() + ":" + getString(R.string.mjpeg_port) + "/stream?type=ros_compressed&topic=/android/image_raw");
+        PREFERENCES.setProperty(getString(R.string.WORKSPACE_X_OFFSET), getString(R.string.workspace_xoffset));
+        PREFERENCES.setProperty(getString(R.string.WORKSPACE_WIDTH), getString(R.string.workspace_width));
+        PREFERENCES.setProperty(getString(R.string.WORKSPACE_Y_OFFSET), getString(R.string.workspace_yoffset));
+        PREFERENCES.setProperty(getString(R.string.WORKSPACE_HEIGHT), getString(R.string.workspace_height));
+
+        if( streamPref.getCheckedRadioButtonId() == R.id.streamMjpeg )
+            PREFERENCES.setProperty( getString(R.string.mjpeg), "" );
+        if( streamPref.getCheckedRadioButtonId() == R.id.streamROSCImage )
+            PREFERENCES.setProperty( getString(R.string.ros_cimage), "" );
+        if( controlPref.getCheckedRadioButtonId() == R.id.controlUDP )
+            PREFERENCES.setProperty( getString(R.string.udp), "" );
+        if( controlPref.getCheckedRadioButtonId() == R.id.controlTCP )
+            PREFERENCES.setProperty( getString(R.string.tcp), "" );
+
         return true;
     }
 

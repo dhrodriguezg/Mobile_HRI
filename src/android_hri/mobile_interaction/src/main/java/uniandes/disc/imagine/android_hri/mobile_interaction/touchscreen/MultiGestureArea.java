@@ -7,7 +7,6 @@ import android.util.TypedValue;
 import android.view.GestureDetector;
 import android.view.MotionEvent;
 import android.view.View;
-import android.widget.ImageView;
 
 /**
  * Created by DarkNeoBahamut on 23/07/2015.
@@ -17,7 +16,7 @@ public class MultiGestureArea extends GestureDetector.SimpleOnGestureListener{
     private static final String TAG = "MultiGestureArea";
 
     private Activity mActivity;
-    private ImageView mView;
+    private View mView;
     private GestureDetector mGestureDetector;
     private static final int INVALID_POINTER_ID = -1;
     private static final int INVALID = -1;
@@ -59,7 +58,7 @@ public class MultiGestureArea extends GestureDetector.SimpleOnGestureListener{
     private float syncX;
     private float syncY;
 
-    public MultiGestureArea(Activity activity, ImageView view){
+    public MultiGestureArea(Activity activity, View view){
         vibrator = (Vibrator) activity.getApplicationContext().getSystemService(Context.VIBRATOR_SERVICE);
         mGestureDetector = new GestureDetector(activity, this);
         ptrID1 = INVALID_POINTER_ID;
@@ -125,10 +124,10 @@ public class MultiGestureArea extends GestureDetector.SimpleOnGestureListener{
                     nfY = event.getY(event.findPointerIndex(ptrID2));
 
                     //Dragging
-                    currPosX = initPosX + (nsX-sX+nfX-fX)/2f;
-                    currPosY = initPosY + (nsY-sY+nfY-fY)/2f;
+                    currPosX = (nsX-sX+nfX-fX)/2f;
+                    currPosY = (nsY-sY+nfY-fY)/2f;
                     //Rotating
-                    currAngle = initAngle + getAngleBetweenLines(fX, fY, sX, sY, nfX, nfY, nsX, nsY);
+                    currAngle = getAngleBetweenLines(fX, fY, sX, sY, nfX, nfY, nsX, nsY);
 
                     //Grasping
                     currDistance = (float) Math.sqrt(Math.pow(nsX - nfX, 2) + Math.pow(nsY - nfY, 2));
@@ -264,6 +263,30 @@ public class MultiGestureArea extends GestureDetector.SimpleOnGestureListener{
 
     public void setDetectingGesture(boolean detectingGesture) {
         this.detectingGesture = detectingGesture;
+    }
+
+    public float getInitAngle() {
+        return initAngle;
+    }
+
+    public void setInitAngle(float initAngle) {
+        this.initAngle = initAngle;
+    }
+
+    public float getInitPosX() {
+        return initPosX;
+    }
+
+    public void setInitPosX(float initPosX) {
+        this.initPosX = initPosX;
+    }
+
+    public float getInitPosY() {
+        return initPosY;
+    }
+
+    public void setInitPosY(float initPosY) {
+        this.initPosY = initPosY;
     }
 
 }
