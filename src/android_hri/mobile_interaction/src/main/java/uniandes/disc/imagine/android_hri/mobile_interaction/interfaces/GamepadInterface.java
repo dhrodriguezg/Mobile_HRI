@@ -261,8 +261,8 @@ public class GamepadInterface extends RosActivity {
         if(!gamepad.isAttached())
             return;
         float steer=-gamepad.getAxisValue(MotionEvent.AXIS_X);
-        float acceleration=-gamepad.getAxisValue(MotionEvent.AXIS_Y)/2f;
-        acceleration += (gamepad.getAxisValue(MotionEvent.AXIS_RTRIGGER) - gamepad.getAxisValue(MotionEvent.AXIS_LTRIGGER))/2f;
+        float acceleration=-gamepad.getAxisValue(MotionEvent.AXIS_Y)/4.f;
+        acceleration += (gamepad.getAxisValue(MotionEvent.AXIS_RTRIGGER) - gamepad.getAxisValue(MotionEvent.AXIS_LTRIGGER))/4.f;
 
         float cameraControlHorizontal= gamepad.getAxisValue(MotionEvent.AXIS_Z);
         float cameraControlVertical= -gamepad.getAxisValue(MotionEvent.AXIS_RZ);

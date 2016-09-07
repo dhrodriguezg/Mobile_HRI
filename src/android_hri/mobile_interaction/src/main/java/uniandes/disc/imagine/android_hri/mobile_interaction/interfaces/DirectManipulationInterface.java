@@ -385,10 +385,10 @@ public class DirectManipulationInterface extends RosActivity implements SensorEv
             steer=0.f;
         if(Math.abs(acceleration) < 0.1f)
             acceleration=0.f;
-        if( acceleration > 0.5f)
-            acceleration=0.5f;
-        else if( acceleration < -0.5f)
-            acceleration=-0.5f;
+        if( acceleration > 0.25f)
+            acceleration=0.25f;
+        else if( acceleration < -0.25f)
+            acceleration=-0.25f;
 
         int ptz = -1;
         if(cameraControlHorizontal < -0.5f)
