@@ -6,6 +6,7 @@ import android.graphics.Color;
 import android.graphics.Typeface;
 import android.util.AttributeSet;
 import android.view.Gravity;
+import android.view.MotionEvent;
 import android.widget.FrameLayout;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
@@ -21,11 +22,11 @@ import uniandes.disc.imagine.android_hri.mobile_interaction.R;
 /**
  * Created by dhrodriguezg on 10/15/15.
  */
-public class ScrollerView extends RelativeLayout{
+public class ScrollerView extends RelativeLayout {
 
     private Context context;
     private RelativeLayout mainLayout;
-    private ScrollView scrollView;
+    private CustomScrollView scrollView;
     private LinearLayout viewContainer;
     private Vector<TextView> vectorText;
     private TextView activeView;
@@ -67,7 +68,7 @@ public class ScrollerView extends RelativeLayout{
         updateView = true;
         percentage = false;
         mainLayout = this;
-        scrollView = new ScrollView(context);
+        scrollView = new CustomScrollView(context);
         viewContainer = new LinearLayout(context);
         viewContainer.setOrientation(LinearLayout.VERTICAL);
         top = new ImageView(context);
@@ -175,10 +176,9 @@ public class ScrollerView extends RelativeLayout{
         updateView = false;
     }
 
-    public float computeSelection(){
+    public void updateView(){
         if(updateView)
             resizeContainer();
-
         int index = Math.round((float)scrollView.getScrollY()/((float)activeView.getHeight()));
         activeView.setTypeface(null, Typeface.NORMAL);
         activeView=vectorText.elementAt(index + maxVisibleItems /2);
@@ -192,7 +192,10 @@ public class ScrollerView extends RelativeLayout{
             belowText.setTextSize(fontSize-Math.abs(belowText.getY()-cy)/(float)belowText.getHeight());
             aboveText.setTextSize(fontSize-0.5f*Math.abs(aboveText.getY()-cy)/(float)aboveText.getHeight());
         }
+    }
 
+    public float getValue(){
+        
         float max=Math.max(topValue,bottomValue);
         float min = Math.min(topValue,bottomValue);
         float normalizedScroll=(float)scrollView.getScrollY()/(float)(viewContainer.getBottom()-scrollView.getHeight());
@@ -222,7 +225,7 @@ public class ScrollerView extends RelativeLayout{
     }
 
     public void beginAtMiddle(){
-        initialPosition=maxTotalItems/2;
+        initialPosition=maxTotalItems/2+1;
     }
 
     public void beginAtItem(int index){
@@ -273,4 +276,39 @@ public class ScrollerView extends RelativeLayout{
         updateView = true;
         this.fontSize = fontSize;
     }
+
+
+    public class CustomScrollView extends ScrollView{
+
+        public CustomScrollView(Context context) {
+            super(context);
+        }
+
+        public CustomScrollView(Context context, AttributeSet attrs) {
+            super(context, attrs);
+        }
+
+        public CustomScrollView(Context context, AttributeSet attrs, int defStyleAttr) {
+            super(context, attrs, defStyleAttr);
+        }
+
+        @Override
+        public void fling(int velocity){
+        }
+
+        @Override
+        public boolean onTouchEvent(MotionEvent motionEvent) {
+            super.onTouchEvent(motionEvent);
+
+            switch (motionEvent.getActionMasked()) {
+                case MotionEvent.ACTION_UP:
+                case MotionEvent.ACTION_POINTER_UP:
+                case MotionEvent.ACTION_CANCEL:
+                    scrollTo(0, (int) vectorText.elementAt(initialPosition - 1).getY());
+                    break;
+            }
+            return true;
+        }
+    }
+
 }

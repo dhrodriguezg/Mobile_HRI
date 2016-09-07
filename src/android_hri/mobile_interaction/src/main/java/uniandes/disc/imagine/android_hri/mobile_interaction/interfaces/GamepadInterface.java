@@ -269,7 +269,7 @@ public class GamepadInterface extends RosActivity {
 
         if(Math.abs(steer) < 0.1f)
             steer=0.f;
-        if(Math.abs(acceleration) < 0.1f)
+        if(Math.abs(acceleration) < 0.025f)
             acceleration=0.f;
 
         int ptz = -1;

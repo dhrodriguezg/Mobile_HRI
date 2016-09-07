@@ -41,7 +41,7 @@
     <string name="interface_gamepad_number">Interface 1</string>
     <string name="interface_screenjoystick_name">2. Screen Joysticks</string>
     <string name="interface_screenjoystick_number">Interface 2</string>
-    <string name="interface_directmanipulation_name">3. Direct Manipulation</string>
+    <string name="interface_directmanipulation_name">3. Gesture</string>
     <string name="interface_directmanipulation_number">Interface 3</string>
     <string name="interface_leapmotion_name">4. Leap Motion</string>
     <string name="interface_leapmotion_number">Interface 4</string>

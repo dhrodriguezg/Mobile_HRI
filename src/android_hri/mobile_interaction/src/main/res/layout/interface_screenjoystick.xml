@@ -59,8 +59,8 @@
 
         <uniandes.disc.imagine.android_hri.mobile_interaction.widget.CustomVirtualJoystickView
             android:id="@+id/virtual_joystick_rot"
-            android:layout_width="120dp"
-            android:layout_height="120dp"
+            android:layout_width="100dp"
+            android:layout_height="100dp"
             android:layout_alignParentBottom="true"
             android:layout_alignParentRight="true"
             android:visibility="invisible"
@@ -72,7 +72,7 @@
             android:layout_width="wrap_content"
             android:layout_height="30dp"
             android:textAppearance="?android:attr/textAppearanceSmall"
-            android:text="@string/rotation_control"
+            android:text="@string/grasping_open"
             android:id="@+id/rotationTextView"
             android:layout_alignTop="@+id/virtual_joystick_rot"
             android:layout_alignLeft="@+id/virtual_joystick_rot"
@@ -86,7 +86,7 @@
             android:layout_width="wrap_content"
             android:layout_height="30dp"
             android:textAppearance="?android:attr/textAppearanceSmall"
-            android:text="@string/total_control"
+            android:text="@string/position_control"
             android:id="@+id/positionTextView"
             android:gravity="center_vertical|center_horizontal"
             android:textColor="#ffd9d9d9"
@@ -277,6 +277,32 @@
             android:checked="false"
             android:textStyle="bold"
             android:visibility="gone" />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="20dp"
+            android:textAppearance="?android:attr/textAppearanceSmall"
+            android:text="@string/grasping_open"
+            android:id="@+id/scrollTextView"
+            android:layout_below="@+id/toggleCamera3"
+            android:layout_alignParentRight="true"
+            android:layout_alignLeft="@id/virtual_joystick_rot"
+            android:gravity="center_vertical|center_horizontal"
+            android:textColor="#ff797979"
+            android:visibility="visible"
+            android:layout_marginRight="5dp" />
+
+        <uniandes.disc.imagine.android_hri.mobile_interaction.widget.ScrollerView
+            android:layout_width="60dp"
+            android:layout_height="wrap_content"
+            android:id="@+id/scrollerView"
+            android:alpha="0.6"
+            android:layout_below="@+id/scrollTextView"
+            android:layout_alignParentBottom="true"
+            android:layout_alignParentRight="true"
+            android:layout_marginRight="20dp"
+            android:layout_marginBottom="3dp"
+            android:visibility="visible" />
 
     </RelativeLayout>
 

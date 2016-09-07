@@ -8,7 +8,6 @@ import android.hardware.SensorEvent;
 import android.hardware.SensorEventListener;
 import android.hardware.SensorManager;
 import android.os.Bundle;
-import android.util.Log;
 import android.util.TypedValue;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -276,22 +275,22 @@ public class DirectManipulationInterface extends RosActivity implements SensorEv
     }
 
     private void updateVelocity() {
-        float y = 0.f;
-        float rot = 0.f;
 
+        float throttle = 0.f;
+        float steer = 0.f;
         float cameraControlHorizontal = 0.f;
         float cameraControlVertical = 0.f;
 
         if(statelessGestureHandler.isDetectingMultiGesture()) {
-            y = -statelessGestureHandler.getPosY();
-            rot = statelessGestureHandler.getRotation();
+            throttle = -statelessGestureHandler.getThrottle();
+            steer = statelessGestureHandler.getSteer();
         }
 
         if(statelessGestureHandler.isDetectingGesture()) {
 
-            if( statelessGestureHandler.isLongPress() ){
+            if( statelessGestureHandler.isDoubleTap() ){
 
-                statelessGestureHandler.setLongPress(false);
+                statelessGestureHandler.setDoubleTap(false);
                 if ( p3dxNumberTopic.getPublisher_int() == 0 ){
                     p3dxNumberTopic.setPublisher_int( 1 );
                 }else{
@@ -329,9 +328,10 @@ public class DirectManipulationInterface extends RosActivity implements SensorEv
 
             }
 
-            if( statelessGestureHandler.isDoubleTap() ){
+            if( statelessGestureHandler.isLongPress() ){
 
-                statelessGestureHandler.setDoubleTap(false);
+                statelessGestureHandler.setLongPress(false);
+
                 int device = p3dxNumberTopic.getPublisher_int();
                 if( device == 0 ){
                     cameraNumberTopic.setPublisher_int(0);
@@ -378,12 +378,16 @@ public class DirectManipulationInterface extends RosActivity implements SensorEv
             }
         }
 
-        float steer = rot/180.f;
-        float acceleration= TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, y, getResources().getDisplayMetrics()) / 1200;
+        float acceleration= TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, throttle, getResources().getDisplayMetrics()) / 1200;
 
         if(Math.abs(steer) < 0.1f)
             steer=0.f;
-        if(Math.abs(acceleration) < 0.1f)
+        if( steer > 1.f)
+            steer=1.f;
+        else if( steer < -1.f)
+            steer=-1.f;
+
+        if(Math.abs(acceleration) < 0.025f)
             acceleration=0.f;
         if( acceleration > 0.25f)
             acceleration=0.25f;
@@ -400,7 +404,6 @@ public class DirectManipulationInterface extends RosActivity implements SensorEv
             ptz=2;
         else if(cameraControlVertical > 0.5f)
             ptz=1;
-
 
         String data="velocity;"+acceleration+";"+steer;
         if(cameraNumberTopic.getPublisher_int()==2 && ptz!=-1){

@@ -1,13 +1,8 @@
 package uniandes.disc.imagine.android_hri.mobile_interaction.interfaces;
 
-import android.content.Context;
 import android.content.Intent;
-import android.content.SharedPreferences;
-import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
 import android.graphics.Color;
 import android.os.Bundle;
-import android.util.Log;
 import android.util.TypedValue;
 import android.view.View;
 import android.view.ViewTreeObserver;
@@ -27,7 +22,6 @@ import org.ros.node.NodeConfiguration;
 import org.ros.node.NodeMainExecutor;
 
 import java.net.URI;
-import java.nio.ByteBuffer;
 
 import sensor_msgs.CompressedImage;
 import uniandes.disc.imagine.android_hri.mobile_interaction.MainActivity;
@@ -40,6 +34,7 @@ import uniandes.disc.imagine.android_hri.mobile_interaction.utils.MjpegInputStre
 import uniandes.disc.imagine.android_hri.mobile_interaction.utils.MjpegView;
 import uniandes.disc.imagine.android_hri.mobile_interaction.utils.UDPComm;
 import uniandes.disc.imagine.android_hri.mobile_interaction.widget.CustomVirtualJoystickView;
+import uniandes.disc.imagine.android_hri.mobile_interaction.widget.ScrollerView;
 
 public class ScreenJoystickInterface extends RosActivity {
 
@@ -72,6 +67,8 @@ public class ScreenJoystickInterface extends RosActivity {
     private TextView textPTZ;
     private UDPComm udpCommCommand;
     private MjpegView mjpegView;
+
+    private ScrollerView graspHandler = null;
 
     private boolean running=true;
     private float maxTargetSpeed;
@@ -154,6 +151,15 @@ public class ScreenJoystickInterface extends RosActivity {
         //joystickRotationNodeMain.setTopicName(JOYROT_TOPIC);
         //androidNode.addNodeMains(joystickPositionNodeMain,joystickRotationNodeMain);
 
+        graspHandler = (ScrollerView) findViewById(R.id.scrollerView);
+        graspHandler.setTopValue(-1.f);
+        graspHandler.setBottomValue(1.f);
+        graspHandler.setFontSize(13);
+        graspHandler.setMaxTotalItems(7);
+        graspHandler.setMaxVisibleItems(7);
+        graspHandler.beginAtMiddle();
+        //graspHandler.showPercentage();
+
         toggleCamera1 = (ToggleButton)findViewById(R.id.toggleCamera1);
         toggleCamera2 = (ToggleButton)findViewById(R.id.toggleCamera2);
         toggleCamera3 = (ToggleButton)findViewById(R.id.toggleCamera3);
@@ -204,7 +210,7 @@ public class ScreenJoystickInterface extends RosActivity {
                     toggleCamera4.setChecked(false);
                     cameraNumberTopic.setPublisher_int(0);
                     cameraNumberTopic.publishNow();
-                    joystickRotationNodeMain.setVisibility(View.INVISIBLE);
+                    //joystickRotationNodeMain.setVisibility(View.INVISIBLE);
                     textPTZ.setVisibility(View.INVISIBLE);
                 }
             }
@@ -221,7 +227,7 @@ public class ScreenJoystickInterface extends RosActivity {
                     toggleCamera4.setChecked(false);
                     cameraNumberTopic.setPublisher_int(1);
                     cameraNumberTopic.publishNow();
-                    joystickRotationNodeMain.setVisibility(View.INVISIBLE);
+                    //joystickRotationNodeMain.setVisibility(View.INVISIBLE);
                     textPTZ.setVisibility(View.INVISIBLE);
                 }
             }
@@ -238,7 +244,7 @@ public class ScreenJoystickInterface extends RosActivity {
                     toggleCamera4.setChecked(false);
                     cameraNumberTopic.setPublisher_int(2);
                     cameraNumberTopic.publishNow();
-                    joystickRotationNodeMain.setVisibility(View.VISIBLE);
+                    //joystickRotationNodeMain.setVisibility(View.VISIBLE);
                     textPTZ.setVisibility(View.VISIBLE);
                 }
             }
@@ -255,7 +261,7 @@ public class ScreenJoystickInterface extends RosActivity {
                     toggleCamera4.setChecked(true);
                     cameraNumberTopic.setPublisher_int(3);
                     cameraNumberTopic.publishNow();
-                    joystickRotationNodeMain.setVisibility(View.INVISIBLE);
+                    //joystickRotationNodeMain.setVisibility(View.INVISIBLE);
                     textPTZ.setVisibility(View.INVISIBLE);
                 }
             }
@@ -392,15 +398,22 @@ public class ScreenJoystickInterface extends RosActivity {
 
     private void updateVelocity(){
 
+        runOnUiThread(new Runnable() {
+            public void run() {
+                graspHandler.updateView();
+            }
+        });
+
         float steer=joystickPositionNodeMain.getAxisY();
-        float acceleration=joystickPositionNodeMain.getAxisX()/4;
+        float acceleration=graspHandler.getValue()/4.f;
+        //float acceleration=joystickRotationNodeMain.getAxisX()/4.f;
 
         float cameraControlHorizontal=joystickRotationNodeMain.getAxisY();
         float cameraControlVertical=joystickRotationNodeMain.getAxisX();
 
         if(Math.abs(steer) < 0.1f)
             steer=0.f;
-        if(Math.abs(acceleration) < 0.1f)
+        if(Math.abs(acceleration) < 0.025f)//
             acceleration=0.f;
 
         int ptz = -1;
@@ -431,6 +444,10 @@ public class ScreenJoystickInterface extends RosActivity {
             velocityTopic.publishNow();
             cameraPTZTopic.publishNow();
         }
+
+
+
+
     }
 
     @Override
