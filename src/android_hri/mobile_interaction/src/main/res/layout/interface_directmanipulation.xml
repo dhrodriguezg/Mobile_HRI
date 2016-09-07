@@ -71,4 +71,83 @@
         android:alpha="0.7"
         android:visibility="gone" />
 
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textAppearance="?android:attr/textAppearanceLarge"
+        android:text="@string/device"
+        android:id="@+id/deviceView"
+        android:gravity="center_horizontal"
+        android:layout_alignTop="@+id/targetCenter"
+        android:layout_alignParentLeft="true"
+        android:layout_alignRight="@+id/virtual_joystick_pos" />
+
+    <RadioButton
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/sim_control"
+        android:id="@+id/radioMSIM"
+        android:checked="true"
+        android:clickable="false"
+        android:layout_below="@+id/deviceView"
+        android:layout_alignParentLeft="true"
+        android:enabled="true" />
+
+    <RadioButton
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/p3dx1_control"
+        android:id="@+id/radioP3DX1"
+        android:checked="false"
+        android:layout_below="@+id/radioMSIM"
+        android:layout_alignParentLeft="true"
+        android:enabled="true"
+        android:clickable="false" />
+
+    <TextView
+        android:layout_width="100dp"
+        android:layout_height="wrap_content"
+        android:textAppearance="?android:attr/textAppearanceLarge"
+        android:text="@string/view"
+        android:id="@+id/cameraView"
+        android:gravity="center_horizontal"
+        android:layout_alignTop="@+id/targetCenter"
+        android:layout_alignParentRight="true" />
+
+    <RadioButton
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/camera1_name"
+        android:id="@+id/radioSimulator"
+        android:checked="true"
+        android:clickable="false"
+        android:layout_below="@+id/cameraView"
+        android:layout_alignLeft="@+id/cameraView"
+        android:enabled="true" />
+
+    <RadioButton
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/camera2_name"
+        android:id="@+id/radioTopDown"
+        android:checked="false"
+        android:layout_below="@+id/radioSimulator"
+        android:layout_alignLeft="@+id/radioSimulator"
+        android:enabled="true"
+        android:clickable="false"
+        android:alpha="0.3" />
+
+    <RadioButton
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/camera3_name"
+        android:id="@+id/radioFirstPerson"
+        android:checked="false"
+        android:layout_below="@+id/radioTopDown"
+        android:layout_alignLeft="@+id/radioTopDown"
+        android:enabled="true"
+        android:clickable="false"
+        android:alpha="0.3" />
+
 </RelativeLayout>

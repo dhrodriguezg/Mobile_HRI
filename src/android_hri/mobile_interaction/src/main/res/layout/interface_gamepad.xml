@@ -16,7 +16,8 @@
         android:src="@drawable/loading_wide"
         android:layout_height="match_parent"
         android:layout_width="match_parent"
-        android:visibility="visible" />
+        android:visibility="visible"
+        android:clickable="false" />
 
     <ImageView
         android:layout_width="50dp"
@@ -31,8 +32,8 @@
     <ImageView
         android:id="@+id/virtual_joystick_pos"
         android:src="@drawable/stick_4c"
-        android:layout_width="100dp"
-        android:layout_height="100dp"
+        android:layout_width="80dp"
+        android:layout_height="80dp"
         android:layout_alignParentBottom="true"
         android:layout_alignParentLeft="true"
         android:alpha="0.4"/>
@@ -53,8 +54,8 @@
     <ImageView
         android:id="@+id/virtual_joystick_rot"
         android:src="@drawable/stick_4c"
-        android:layout_width="100dp"
-        android:layout_height="100dp"
+        android:layout_width="80dp"
+        android:layout_height="80dp"
         android:layout_alignParentBottom="true"
         android:layout_alignParentRight="true"
         android:alpha="0.4"
@@ -77,7 +78,7 @@
     <ImageView
         android:id="@+id/virtual_trigger_close"
         android:src="@drawable/trigger_4c"
-        android:layout_width="100dp"
+        android:layout_width="70dp"
         android:layout_height="70dp"
         android:layout_alignParentTop="true"
         android:layout_alignParentLeft="true"
@@ -99,7 +100,7 @@
     <ImageView
         android:id="@+id/virtual_trigger_open"
         android:src="@drawable/trigger_4c"
-        android:layout_width="100dp"
+        android:layout_width="70dp"
         android:layout_height="70dp"
         android:layout_alignParentTop="true"
         android:layout_alignParentRight="true"
@@ -139,5 +140,83 @@
         android:layout_centerHorizontal="true"
         android:alpha="0.7"
         android:visibility="invisible" />
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textAppearance="?android:attr/textAppearanceLarge"
+        android:text="@string/device"
+        android:id="@+id/deviceView"
+        android:gravity="center_horizontal"
+        android:layout_alignTop="@+id/targetCenter"
+        android:layout_alignParentLeft="true"
+        android:layout_alignRight="@+id/virtual_joystick_pos" />
+
+    <RadioButton
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/sim_control"
+        android:id="@+id/radioMSIM"
+        android:checked="true"
+        android:clickable="false"
+        android:layout_below="@+id/deviceView"
+        android:layout_alignParentLeft="true"
+        android:enabled="true" />
+
+    <RadioButton
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/p3dx1_control"
+        android:id="@+id/radioP3DX1"
+        android:checked="false"
+        android:layout_below="@+id/radioMSIM"
+        android:layout_alignParentLeft="true"
+        android:enabled="true"
+        android:clickable="false" />
+
+    <TextView
+        android:layout_width="100dp"
+        android:layout_height="wrap_content"
+        android:textAppearance="?android:attr/textAppearanceLarge"
+        android:text="@string/view"
+        android:id="@+id/cameraView"
+        android:gravity="center_horizontal"
+        android:layout_alignTop="@+id/targetCenter"
+        android:layout_alignParentRight="true" />
+
+    <RadioButton
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/camera1_name"
+        android:id="@+id/radioSimulator"
+        android:checked="true"
+        android:clickable="false"
+        android:layout_below="@+id/cameraView"
+        android:layout_alignLeft="@+id/cameraView"
+        android:enabled="true" />
+
+    <RadioButton
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/camera2_name"
+        android:id="@+id/radioTopDown"
+        android:checked="false"
+        android:layout_below="@+id/radioSimulator"
+        android:layout_alignLeft="@+id/radioSimulator"
+        android:enabled="true"
+        android:clickable="false"
+        android:alpha="0.3" />
+
+    <RadioButton
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/camera3_name"
+        android:id="@+id/radioFirstPerson"
+        android:checked="false"
+        android:layout_below="@+id/radioTopDown"
+        android:layout_alignLeft="@+id/radioTopDown"
+        android:enabled="true"
+        android:clickable="false"
+        android:alpha="0.3" />
 
 </RelativeLayout>

@@ -94,6 +94,18 @@
             android:layout_alignRight="@+id/virtual_joystick_pos"
             android:layout_marginLeft="5dp" />
 
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textAppearance="?android:attr/textAppearanceLarge"
+            android:text="@string/view"
+            android:id="@+id/camaraControl"
+            android:layout_alignParentTop="true"
+            android:layout_alignParentRight="true"
+            android:layout_marginTop="5dp"
+            android:layout_alignLeft="@+id/virtual_joystick_rot"
+            android:gravity="center_horizontal" />
+
         <ToggleButton
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
@@ -102,6 +114,7 @@
             android:textOff="@string/camera1_name"
             android:checked="true"
             android:layout_alignLeft="@+id/virtual_joystick_rot"
+            android:layout_below="@+id/camaraControl"
             android:layout_alignParentRight="true"
             android:layout_marginTop="5dp" />
 
@@ -115,7 +128,8 @@
             android:layout_below="@+id/toggleCamera1"
             android:layout_alignParentRight="true"
             android:layout_alignLeft="@+id/toggleCamera1"
-            android:layout_marginTop="5dp" />
+            android:layout_marginTop="5dp"
+            android:enabled="false" />
 
 
         <ToggleButton
@@ -128,7 +142,8 @@
             android:layout_below="@+id/toggleCamera2"
             android:layout_alignParentRight="true"
             android:layout_alignLeft="@+id/toggleCamera1"
-            android:layout_marginTop="5dp" />
+            android:layout_marginTop="5dp"
+            android:enabled="false" />
 
 
         <ToggleButton
@@ -144,15 +159,27 @@
             android:layout_marginTop="5dp"
             android:visibility="gone" />
 
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textAppearance="?android:attr/textAppearanceLarge"
+            android:text="@string/device"
+            android:id="@+id/deviceControl"
+            android:layout_alignParentTop="true"
+            android:layout_alignParentLeft="true"
+            android:layout_marginTop="5dp"
+            android:layout_marginLeft="2dp"
+            android:layout_alignRight="@+id/virtual_joystick_pos"
+            android:gravity="center_horizontal" />
+
         <ImageView
             android:layout_width="30dp"
             android:layout_height="45dp"
             android:id="@+id/imageSimulator"
             android:src="@drawable/sim_control"
-            android:layout_alignParentTop="true"
-            android:layout_alignParentLeft="true"
-            android:layout_marginTop="5dp"
-            android:layout_marginLeft="2dp"/>
+            android:layout_below="@+id/deviceControl"
+            android:layout_alignLeft="@+id/deviceControl"
+            android:layout_marginTop="5dp"/>
 
         <ToggleButton
             android:layout_width="wrap_content"

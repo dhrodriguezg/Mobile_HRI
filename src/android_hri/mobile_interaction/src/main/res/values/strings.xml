@@ -9,6 +9,8 @@
     <string name="emergency_on_msg">EMERGENCY STOP ACTIVATED!</string>
     <string name="emergency_off_msg">EMERGENCY STOP DEACTIVATED!</string>
     <string name="max_target_speed">0.3</string>
+    <string name="device">Device</string>
+    <string name="view">View</string>
 
     <!-- MAIN TEXT -->
     <string name="app_name">Mobile Android Interface</string>
