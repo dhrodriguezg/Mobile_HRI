@@ -116,9 +116,10 @@ public class ScreenJoystickInterface extends RosActivity {
         interfaceNumberTopic.setPublisher_int(2);
 
         cameraNumberTopic = new Int32Topic();
-        cameraNumberTopic.publishTo(getString(R.string.topic_camera_number), false, 10);
+        cameraNumberTopic.publishTo(getString(R.string.topic_camera_number), false, 100);
         cameraNumberTopic.setPublishingFreq(10);
         cameraNumberTopic.setPublisher_int(0);
+        cameraNumberTopic.publishNow();
 
         cameraPTZTopic = new Int32Topic();
         cameraPTZTopic.publishTo(getString(R.string.topic_camera_ptz), false, 10);
@@ -126,9 +127,10 @@ public class ScreenJoystickInterface extends RosActivity {
         cameraPTZTopic.setPublisher_int(-1);
 
         p3dxNumberTopic = new Int32Topic();
-        p3dxNumberTopic.publishTo(getString(R.string.topic_p3dx_number), false, 10);
+        p3dxNumberTopic.publishTo(getString(R.string.topic_p3dx_number), false, 100);
         p3dxNumberTopic.setPublishingFreq(10);
         p3dxNumberTopic.setPublisher_int(0);
+        p3dxNumberTopic.publishNow();
 
         emergencyTopic = new BooleanTopic();
         emergencyTopic.publishTo(getString(R.string.topic_emergencystop), true, 0);
@@ -190,8 +192,6 @@ public class ScreenJoystickInterface extends RosActivity {
                 }
             }
         });
-
-
 
         toggleCamera1.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
             @Override
@@ -287,6 +287,13 @@ public class ScreenJoystickInterface extends RosActivity {
                     toggleP3DX2Control.setChecked(false);
                     p3dxNumberTopic.setPublisher_int(0);
                     p3dxNumberTopic.publishNow();
+
+                    toggleCamera1.setChecked(true);
+                    toggleCamera1.setEnabled(true);
+                    toggleCamera2.setChecked(false);
+                    toggleCamera2.setEnabled(false);
+                    toggleCamera3.setChecked(false);
+                    toggleCamera3.setEnabled(false);
                 }
             }
         });
@@ -302,6 +309,13 @@ public class ScreenJoystickInterface extends RosActivity {
                     toggleP3DX2Control.setChecked(false);
                     p3dxNumberTopic.setPublisher_int(1);
                     p3dxNumberTopic.publishNow();
+
+                    toggleCamera1.setChecked(false);
+                    toggleCamera1.setEnabled(false);
+                    toggleCamera2.setChecked(true);
+                    toggleCamera2.setEnabled(true);
+                    toggleCamera3.setChecked(false);
+                    toggleCamera3.setEnabled(true);
                 }
             }
         });
@@ -317,6 +331,13 @@ public class ScreenJoystickInterface extends RosActivity {
                     toggleP3DX2Control.setChecked(true);
                     p3dxNumberTopic.setPublisher_int(2);
                     p3dxNumberTopic.publishNow();
+
+                    toggleCamera1.setChecked(false);
+                    toggleCamera1.setEnabled(false);
+                    toggleCamera2.setChecked(true);
+                    toggleCamera2.setEnabled(true);
+                    toggleCamera3.setChecked(false);
+                    toggleCamera3.setEnabled(true);
                 }
             }
         });
@@ -395,9 +416,11 @@ public class ScreenJoystickInterface extends RosActivity {
 
         String data="velocity;"+acceleration+";"+steer;
         if(cameraNumberTopic.getPublisher_int()==2 && ptz!=-1){
-            cameraPTZTopic.setPublisher_int(ptz);
             data+=";ptz;"+ptz;
+        }else{
+            ptz=-1;
         }
+        cameraPTZTopic.setPublisher_int(ptz);
 
         if ( MainActivity.PREFERENCES.containsKey((getString(R.string.udp))) )
             udpCommCommand.sendData(data.getBytes());

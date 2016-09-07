@@ -28,7 +28,8 @@ public class MultiGestureArea extends GestureDetector.SimpleOnGestureListener{
     private static final float MAX_GRASP = 2.f;
     private static final float MIN_GRASP = .1f;
 
-    private boolean detectingGesture =false;
+    private boolean detectingMultiGesture = false;
+    private boolean detectingGesture = false;
     private float fX, fY, sX, sY;
     private float nfX, nfY, nsX, nsY;
     private int ptrID1, ptrID2;
@@ -51,12 +52,17 @@ public class MultiGestureArea extends GestureDetector.SimpleOnGestureListener{
     private float targetX;
     private float targetY;
 
+    private float flingX;
+    private float flingY;
+
     private long initTime=0;
     private long endTime=0;
     private boolean synced;
     private boolean isTarget;
-    private float syncX;
-    private float syncY;
+
+    private boolean isLongPress;
+    private boolean isDoubleTap;
+    private boolean isFling;
 
     public MultiGestureArea(Activity activity, View view){
         vibrator = (Vibrator) activity.getApplicationContext().getSystemService(Context.VIBRATOR_SERVICE);
@@ -93,7 +99,7 @@ public class MultiGestureArea extends GestureDetector.SimpleOnGestureListener{
                 ptrID1 = event.getPointerId(event.getActionIndex());
                 break;
             case MotionEvent.ACTION_POINTER_DOWN:
-                detectingGesture = true;
+                detectingMultiGesture = true;
                 if(ptrID1 == INVALID_POINTER_ID || ptrID2 != INVALID_POINTER_ID) //to ignore 3 or more finger inputs
                     return;
                 ptrID2 = event.getPointerId(event.getActionIndex());
@@ -106,18 +112,12 @@ public class MultiGestureArea extends GestureDetector.SimpleOnGestureListener{
                 initPosX = getPosX();
                 initPosY = getPosY();
                 initAngle = getRotation();
-                initGrasp = getGrasp();
                 initDistance = (float) Math.sqrt(Math.pow(sX - fX, 2) + Math.pow(sY - fY, 2));
                 initDistance = TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, initDistance, mActivity.getResources().getDisplayMetrics());
-                if(synced){
-                    synced =false;
-                    initPosX = syncX;
-                    initPosY = syncY;
-                }
                 break;
             case MotionEvent.ACTION_MOVE:
                 if (ptrID1 != INVALID_POINTER_ID && ptrID2 != INVALID_POINTER_ID) {
-                    detectingGesture = true;
+                    detectingMultiGesture = true;
                     nsX = event.getX(event.findPointerIndex(ptrID1));
                     nsY = event.getY(event.findPointerIndex(ptrID1));
                     nfX = event.getX(event.findPointerIndex(ptrID2));
@@ -129,15 +129,8 @@ public class MultiGestureArea extends GestureDetector.SimpleOnGestureListener{
                     //Rotating
                     currAngle = getAngleBetweenLines(fX, fY, sX, sY, nfX, nfY, nsX, nsY);
 
-                    //Grasping
-                    currDistance = (float) Math.sqrt(Math.pow(nsX - nfX, 2) + Math.pow(nsY - nfY, 2));
-                    currDistance = TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, currDistance, mActivity.getResources().getDisplayMetrics());
-                    float normalizedDistance = (currDistance-initDistance)/REF_DISTANCE_DIP;
-                    currGrasp = Math.max(MIN_GRASP,Math.min(initGrasp - normalizedDistance,MAX_GRASP));
-
                     setPosX(currPosX); setPosY(currPosY);
                     setRotation(currAngle);
-                    setGrasp(currGrasp);
                 }
                 break;
             case MotionEvent.ACTION_UP:
@@ -150,20 +143,13 @@ public class MultiGestureArea extends GestureDetector.SimpleOnGestureListener{
                     ptrID2 = INVALID_POINTER_ID;
 
                 if(ptrID1 == INVALID_POINTER_ID || ptrID2 == INVALID_POINTER_ID){
-                    detectingGesture = false;
-                    if( endTime-initTime < FAST_GRASPING_TIME_THREASHOLD){
-                        if(currDistance-initDistance > FAST_GRASPING_DISTANCE_THREASHOLD)
-                            currGrasp = MIN_GRASP;
-                        else if(initDistance-currDistance > FAST_GRASPING_DISTANCE_THREASHOLD)
-                            currGrasp = MAX_GRASP;
-                        setGrasp(currGrasp);
-                    }
+                    detectingMultiGesture = false;
                 }
                 break;
             case MotionEvent.ACTION_CANCEL:
                 ptrID1 = INVALID_POINTER_ID;
                 ptrID2 = INVALID_POINTER_ID;
-                detectingGesture = false;
+                detectingMultiGesture = false;
                 break;
         }
 
@@ -171,19 +157,31 @@ public class MultiGestureArea extends GestureDetector.SimpleOnGestureListener{
 
     @Override
     public void onLongPress(MotionEvent event) {
-        targetX =event.getX();
-        targetY =event.getY();
-        vibrator.vibrate(200);
-        isTarget = true;
+        detectingGesture = true;
+        isLongPress = true;
     }
 
-    public void resetTarget(){
-        isTarget = false;
+    @Override
+    public boolean onDoubleTap(MotionEvent event) {
+        detectingGesture = true;
+        isDoubleTap = true;
+        return true;
     }
 
-    public boolean isTargetSelected(){
-        return isTarget;
+    @Override
+    public boolean onFling(MotionEvent initial_event, MotionEvent current_event, float velocityX, float velocityY) {
+        detectingGesture = true;
+        isFling = true;
+        if( Math.abs(velocityX) > Math.abs(velocityY) ){
+            flingX = velocityX > 0f ? 1.f : -1.f;
+            flingY = 0.f;
+        }else{
+            flingX = 0.f;
+            flingY = velocityY > 0f ? 1.f : -1.f;
+        }
+        return true;
     }
+
 
     private float getAngleBetweenLines (float fX, float fY, float sX, float sY, float nfX, float nfY, float nsX, float nsY) {
         float angle1 = (float) Math.atan2((fY - sY), (fX - sX));
@@ -195,50 +193,12 @@ public class MultiGestureArea extends GestureDetector.SimpleOnGestureListener{
         return angle;
     }
 
-    public void syncPos(float x, float y){
-        synced = true;
-        syncX =x;
-        syncY =y;
-    }
-
-    public float getTargetX() {
-        return targetX;
-    }
-
-    public void setTargetX(float targetX) {
-        this.targetX = targetX;
-    }
-
-    public float getTargetY() {
-        return targetY;
-    }
-
-    public void setTargetY(float targetY) {
-        this.targetY = targetY;
-    }
-
-    public boolean isTarget() {
-        return isTarget;
-    }
-
-    public void setIsTarget(boolean isTarget) {
-        this.isTarget = isTarget;
-    }
-
     public float getRotation() {
         return rotation;
     }
 
     public void setRotation(float rotation) {
         this.rotation = rotation;
-    }
-
-    public float getGrasp() {
-        return grasp;
-    }
-
-    public void setGrasp(float grasp) {
-        this.grasp = grasp;
     }
 
     public float getPosX() {
@@ -257,6 +217,14 @@ public class MultiGestureArea extends GestureDetector.SimpleOnGestureListener{
         this.posY = posY;
     }
 
+    public boolean isDetectingMultiGesture() {
+        return detectingMultiGesture;
+    }
+
+    public void setDetectingMultiGesture(boolean detectingMultiGesture) {
+        this.detectingMultiGesture = detectingMultiGesture;
+    }
+
     public boolean isDetectingGesture() {
         return detectingGesture;
     }
@@ -265,28 +233,44 @@ public class MultiGestureArea extends GestureDetector.SimpleOnGestureListener{
         this.detectingGesture = detectingGesture;
     }
 
-    public float getInitAngle() {
-        return initAngle;
+    public boolean isFling() {
+        return isFling;
     }
 
-    public void setInitAngle(float initAngle) {
-        this.initAngle = initAngle;
+    public void setFling(boolean isFling) {
+        this.isFling = isFling;
     }
 
-    public float getInitPosX() {
-        return initPosX;
+    public boolean isLongPress() {
+        return isLongPress;
     }
 
-    public void setInitPosX(float initPosX) {
-        this.initPosX = initPosX;
+    public void setLongPress(boolean isLongPress) {
+        this.isLongPress = isLongPress;
     }
 
-    public float getInitPosY() {
-        return initPosY;
+    public boolean isDoubleTap() {
+        return isDoubleTap;
     }
 
-    public void setInitPosY(float initPosY) {
-        this.initPosY = initPosY;
+    public void setDoubleTap(boolean isDoubleTap) {
+        this.isDoubleTap = isDoubleTap;
+    }
+
+    public float getFlingX() {
+        return flingX;
+    }
+
+    public void setFlingX(float flingX) {
+        this.flingX = flingX;
+    }
+
+    public float getFlingY() {
+        return flingY;
+    }
+
+    public void setFlingY(float flingY) {
+        this.flingY = flingY;
     }
 
 }

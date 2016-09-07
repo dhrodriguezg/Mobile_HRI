@@ -3,12 +3,12 @@ package uniandes.disc.imagine.android_hri.mobile_interaction.interfaces;
 import android.content.Context;
 import android.content.Intent;
 import android.graphics.Color;
-import android.graphics.Matrix;
 import android.hardware.Sensor;
 import android.hardware.SensorEvent;
 import android.hardware.SensorEventListener;
 import android.hardware.SensorManager;
 import android.os.Bundle;
+import android.util.Log;
 import android.util.TypedValue;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -17,6 +17,7 @@ import android.view.ViewTreeObserver;
 import android.view.WindowManager;
 import android.widget.CompoundButton;
 import android.widget.ImageView;
+import android.widget.RadioButton;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -58,6 +59,11 @@ public class DirectManipulationInterface extends RosActivity implements SensorEv
     private ImageView targetImage;
     private ImageView positionImage;
     private TextView msgText;
+    private RadioButton deviceMsim;
+    private RadioButton deviceP3DX1;
+    private RadioButton cameraSim;
+    private RadioButton cameraTopDown;
+    private RadioButton cameraFirstPerson;
 
     private AndroidNode androidNode;
     private BooleanTopic emergencyTopic;
@@ -65,6 +71,9 @@ public class DirectManipulationInterface extends RosActivity implements SensorEv
     private PointTopic positionTopic;
     private PointTopic rotationTopic;
     private Float32Topic graspTopic;
+    private Int32Topic cameraNumberTopic;
+    private Int32Topic cameraPTZTopic;
+    private Int32Topic p3dxNumberTopic;
     private TwistTopic velocityTopic;
 
     private StringBuffer msg;
@@ -93,6 +102,12 @@ public class DirectManipulationInterface extends RosActivity implements SensorEv
         getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN, WindowManager.LayoutParams.FLAG_FULLSCREEN);
         getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
         setContentView(R.layout.interface_directmanipulation);
+
+        deviceMsim = (RadioButton) findViewById(R.id.radioMSIM);
+        deviceP3DX1 = (RadioButton) findViewById(R.id.radioP3DX1);
+        cameraSim = (RadioButton) findViewById(R.id.radioSimulator);
+        cameraTopDown = (RadioButton) findViewById(R.id.radioTopDown);
+        cameraFirstPerson = (RadioButton) findViewById(R.id.radioFirstPerson);
 
         maxTargetSpeed =TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, Float.parseFloat(getString(R.string.max_target_speed)), getResources().getDisplayMetrics());
         moveMsg=getString(R.string.move_msg) + " (%.4f , %.4f)";
@@ -142,17 +157,34 @@ public class DirectManipulationInterface extends RosActivity implements SensorEv
         interfaceNumberTopic.setPublishingFreq(100);
         interfaceNumberTopic.setPublisher_int(3);
 
+        cameraNumberTopic = new Int32Topic();
+        cameraNumberTopic.publishTo(getString(R.string.topic_camera_number), false, 100);
+        cameraNumberTopic.setPublishingFreq(10);
+        cameraNumberTopic.setPublisher_int(0);
+        cameraNumberTopic.publishNow();
+
+        cameraPTZTopic = new Int32Topic();
+        cameraPTZTopic.publishTo(getString(R.string.topic_camera_ptz), false, 10);
+        cameraPTZTopic.setPublishingFreq(10);
+        cameraPTZTopic.setPublisher_int(-1);
+
+        p3dxNumberTopic = new Int32Topic();
+        p3dxNumberTopic.publishTo(getString(R.string.topic_p3dx_number), false, 100);
+        p3dxNumberTopic.setPublishingFreq(10);
+        p3dxNumberTopic.setPublisher_int(0);
+        p3dxNumberTopic.publishNow();
+
         emergencyTopic = new BooleanTopic();
         emergencyTopic.publishTo(getString(R.string.topic_emergencystop), true, 0);
         emergencyTopic.setPublishingFreq(100);
         emergencyTopic.setPublisher_bool(true);
 
         androidNode = new AndroidNode(NODE_NAME);
-        androidNode.addTopics( emergencyTopic, interfaceNumberTopic); //positionTopic, graspTopic, rotationTopic,
+        androidNode.addTopics(emergencyTopic, p3dxNumberTopic, cameraNumberTopic, interfaceNumberTopic); //positionTopic, graspTopic, rotationTopic,
         androidNode.addNodeMain(imageStreamNodeMain);
 
         if ( MainActivity.PREFERENCES.containsKey((getString(R.string.tcp))) )
-            androidNode.addTopics(velocityTopic );
+            androidNode.addTopics(velocityTopic, cameraPTZTopic );
         if ( MainActivity.PREFERENCES.containsKey((getString(R.string.ros_cimage))) ) {
             androidNode.addNodeMain(imageStreamNodeMain);
             statelessGestureHandler = new MultiGestureArea(this, imageStreamNodeMain);
@@ -160,9 +192,9 @@ public class DirectManipulationInterface extends RosActivity implements SensorEv
             imageStreamNodeMain.setVisibility( View.GONE );
         if ( !MainActivity.PREFERENCES.containsKey((getString(R.string.mjpeg))) )
             mjpegView.setVisibility(View.GONE);
-        else
+        else {
             statelessGestureHandler = new MultiGestureArea(this, mjpegView);
-
+        }
         senSensorManager = (SensorManager) getSystemService(Context.SENSOR_SERVICE);
         senAccelerometer = senSensorManager.getDefaultSensor(Sensor.TYPE_ACCELEROMETER);
         senSensorManager.registerListener(this, senAccelerometer, SensorManager.SENSOR_DELAY_NORMAL);
@@ -204,7 +236,6 @@ public class DirectManipulationInterface extends RosActivity implements SensorEv
 
     private void onPostLayout(){
         lastPosition = new float[]{targetImage.getX()+targetImage.getWidth()/2, targetImage.getY()+targetImage.getHeight()/2};
-        statelessGestureHandler.syncPos(lastPosition[0], lastPosition[1]); //This way the tracker begins at the target position
         int px = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 120, getResources().getDisplayMetrics()); //convert pid to pixel
         RelativeLayout.LayoutParams params = (RelativeLayout.LayoutParams)targetImage.getLayoutParams();
         params.rightMargin=px;
@@ -248,9 +279,103 @@ public class DirectManipulationInterface extends RosActivity implements SensorEv
         float y = 0.f;
         float rot = 0.f;
 
-        if(statelessGestureHandler.isDetectingGesture()) {
+        float cameraControlHorizontal = 0.f;
+        float cameraControlVertical = 0.f;
+
+        if(statelessGestureHandler.isDetectingMultiGesture()) {
             y = -statelessGestureHandler.getPosY();
             rot = statelessGestureHandler.getRotation();
+        }
+
+        if(statelessGestureHandler.isDetectingGesture()) {
+
+            if( statelessGestureHandler.isLongPress() ){
+
+                statelessGestureHandler.setLongPress(false);
+                if ( p3dxNumberTopic.getPublisher_int() == 0 ){
+                    p3dxNumberTopic.setPublisher_int( 1 );
+                }else{
+                    p3dxNumberTopic.setPublisher_int(0);
+                }
+                p3dxNumberTopic.publishNow();
+
+                runOnUiThread(new Runnable() {
+                    public void run() {
+                        if (p3dxNumberTopic.getPublisher_int() == 0) {
+                            deviceMsim.setChecked(true);
+                            deviceP3DX1.setChecked(false);
+                            cameraSim.setChecked(true);
+                            cameraSim.setAlpha(1.f);
+                            cameraTopDown.setChecked(false);
+                            cameraTopDown.setAlpha(.3f);
+                            cameraFirstPerson.setChecked(false);
+                            cameraFirstPerson.setAlpha(.3f);
+                            cameraNumberTopic.setPublisher_int(0);
+                            cameraNumberTopic.publishNow();
+                        } else {
+                            deviceMsim.setChecked(false);
+                            deviceP3DX1.setChecked(true);
+                            cameraSim.setChecked(false);
+                            cameraSim.setAlpha(.3f);
+                            cameraTopDown.setChecked(true);
+                            cameraTopDown.setAlpha(1.f);
+                            cameraFirstPerson.setChecked(false);
+                            cameraFirstPerson.setAlpha(1.f);
+                            cameraNumberTopic.setPublisher_int(1);
+                            cameraNumberTopic.publishNow();
+                        }
+                    }
+                });
+
+            }
+
+            if( statelessGestureHandler.isDoubleTap() ){
+
+                statelessGestureHandler.setDoubleTap(false);
+                int device = p3dxNumberTopic.getPublisher_int();
+                if( device == 0 ){
+                    cameraNumberTopic.setPublisher_int(0);
+                    cameraNumberTopic.publishNow();
+                }else{
+                    if ( cameraNumberTopic.getPublisher_int() == 1 ){
+                        cameraNumberTopic.setPublisher_int( 2 );
+                    }else{
+                        cameraNumberTopic.setPublisher_int( 1 );
+                    }
+                    cameraNumberTopic.publishNow();
+                }
+
+                runOnUiThread(new Runnable() {
+                    public void run() {
+                        String msg = "Camera: ";
+                        if (cameraNumberTopic.getPublisher_int() == 0 ) {
+                            msg += "Simulation";
+                            cameraSim.setChecked(true);
+                            cameraTopDown.setChecked(false);
+                            cameraFirstPerson.setChecked(false);
+                        } else if (cameraNumberTopic.getPublisher_int() == 1 ) {
+                            msg += "Top-Down";
+                            cameraSim.setChecked(false);
+                            cameraTopDown.setChecked(true);
+                            cameraFirstPerson.setChecked(false);
+                        } else if (cameraNumberTopic.getPublisher_int() == 2 ) {
+                            msg += "First Person";
+                            cameraSim.setChecked(false);
+                            cameraTopDown.setChecked(false);
+                            cameraFirstPerson.setChecked(true);
+                        } else if (cameraNumberTopic.getPublisher_int() == 3) {
+                            msg += "Web Cam";
+                        }
+                        Toast.makeText(getApplicationContext(), msg, Toast.LENGTH_SHORT).show();
+                    }
+                });
+            }
+
+            if( statelessGestureHandler.isFling() ){
+                statelessGestureHandler.setFling(false);
+                cameraControlHorizontal = -statelessGestureHandler.getFlingX();
+                cameraControlVertical = -statelessGestureHandler.getFlingY();
+            }
         }
 
         float steer = rot/180.f;
@@ -265,7 +390,25 @@ public class DirectManipulationInterface extends RosActivity implements SensorEv
         else if( acceleration < -0.5f)
             acceleration=-0.5f;
 
+        int ptz = -1;
+        if(cameraControlHorizontal < -0.5f)
+            ptz=4;
+        else if(cameraControlHorizontal > 0.5f)
+            ptz=3;
+
+        if(cameraControlVertical < -0.5f)
+            ptz=2;
+        else if(cameraControlVertical > 0.5f)
+            ptz=1;
+
+
         String data="velocity;"+acceleration+";"+steer;
+        if(cameraNumberTopic.getPublisher_int()==2 && ptz!=-1){
+            data+=";ptz;"+ptz;
+        }else{
+            ptz=-1;
+        }
+        cameraPTZTopic.setPublisher_int(ptz);
 
         if ( MainActivity.PREFERENCES.containsKey((getString(R.string.udp))) )
             udpCommCommand.sendData(data.getBytes());
@@ -274,9 +417,10 @@ public class DirectManipulationInterface extends RosActivity implements SensorEv
             velocityTopic.setPublisher_linear(new float[]{acceleration, 0, 0});
             velocityTopic.setPublisher_angular(new float[]{0, 0, steer});
             velocityTopic.publishNow();
+            cameraPTZTopic.publishNow();
         }
 
-        msg.append(String.format("Steer: %.4f | Throttle: %.4f) ", steer, acceleration ));
+        msg.append(String.format("Steer: %.4f | Throttle: %.4f ", steer, acceleration ));
     }
 
 
