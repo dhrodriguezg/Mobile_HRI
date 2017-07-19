@@ -405,7 +405,7 @@ public class ScreenJoystickInterface extends RosActivity {
         });
 
         float steer=joystickPositionNodeMain.getAxisY();
-        float acceleration=graspHandler.getValue()/4.f;
+        float acceleration=graspHandler.getValue()/1.f;
         //float acceleration=joystickRotationNodeMain.getAxisX()/4.f;
 
         float cameraControlHorizontal=joystickRotationNodeMain.getAxisY();
